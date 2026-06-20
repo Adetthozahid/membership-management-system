@@ -1,0 +1,312 @@
+Membership Management System
+Member Status Update Side Effects Audit Report
+Date: 2026-06-21
+Scope: Backend member status side effects only
+
+Important note:
+- This is an audit/report only.
+- No code was changed for this report.
+- UI, database schema, API response format, and business logic were not changed.
+
+
+1. Where Member Status Is Updated
+
+Primary file:
+- apps/api/src/members/members.service.ts
+
+Status update locations:
+- markUnderReview()
+  - Sets member.status to under_review.
+
+- approveApplication()
+  - Sets member.status to active.
+  - Creates or updates linked User.
+  - Assigns member role.
+  - Sets User.isActive to true.
+  - Creates membership period when applicable.
+
+- rejectApplication()
+  - Sets member.status to rejected through transitionApplication().
+
+- requestCorrection()
+  - Sets member.status to correction_requested.
+
+- submitCorrection()
+  - Sets member.status to under_review.
+
+- updateStatus()
+  - Admin-driven generic status update.
+  - Can set any MemberStatus from UpdateMemberStatusDto.
+
+- transitionApplication()
+  - Shared helper used by some workflow transitions.
+
+Most important risky method:
+- apps/api/src/members/members.service.ts -> updateStatus()
+
+Reason:
+- It changes member.status and creates a status log.
+- It does not clearly update linked User access state.
+- It does not revoke refresh sessions.
+- It does not remove roles.
+
+
+2. Which Statuses Exist
+
+From Prisma MemberStatus enum:
+- pending
+- under_review
+- correction_requested
+- approved
+- rejected
+- active
+- inactive
+- suspended
+- expired
+
+
+3. What Currently Happens To Linked User When Status Changes
+
+Current approval behavior:
+- approveApplication() creates or updates User.
+- User.email is set from member email.
+- User.fullName is set from member fullName.
+- User.passwordHash is set to a temporary password hash.
+- User.mustChangePassword is set to true.
+- User.isActive is set to true.
+- Member role is assigned.
+- Member status is set to active.
+
+Current generic status update behavior:
+- updateStatus() updates member.status.
+- updateStatus() creates MemberStatusLog.
+- updateStatus() updates status metadata such as approvedAt, rejectedByUserId, correction note, expiredAt.
+- updateStatus() does not update linked User.isActive.
+- updateStatus() does not revoke refresh sessions.
+- updateStatus() does not remove member role.
+
+Current rejection/correction workflow behavior:
+- rejectApplication() and requestCorrection() update member status.
+- They do not clearly deactivate linked User.
+- They do not clearly revoke refresh sessions.
+
+
+4. Whether Refresh Sessions Or Tokens Are Revoked
+
+Current refresh session behavior:
+- AuthService.logout() revokes the current refresh token session by token hash.
+- AuthService.refresh() rotates the refresh token session.
+- AuthService.issueTokens() creates a refresh token session.
+
+Current member status update behavior:
+- updateStatus() does not revoke RefreshTokenSession records.
+- rejectApplication() does not revoke RefreshTokenSession records.
+- requestCorrection() does not revoke RefreshTokenSession records.
+- markUnderReview() does not revoke RefreshTokenSession records.
+- submitCorrection() does not revoke RefreshTokenSession records.
+
+Security note:
+- Existing access tokens remain valid until expiry.
+- Existing refresh tokens remain usable as long as User.isActive remains true.
+
+
+5. Whether User.isActive Changes
+
+Current behavior:
+- approveApplication() sets User.isActive = true.
+- AuthService.validateUser() blocks login if User.isActive is false.
+- AuthService.getAuthProfile() blocks refresh/profile if User.isActive is false.
+- updateStatus() does not change User.isActive.
+- rejectApplication() does not change User.isActive.
+- requestCorrection() does not change User.isActive.
+- expired/inactive/suspended status changes do not currently deactivate linked User.
+
+
+6. Whether Roles Or Permissions Change
+
+Current behavior:
+- approveApplication() assigns the member role through UserRoleAssignment.
+- updateStatus() does not remove member role.
+- rejectApplication() does not remove member role.
+- inactive/suspended/expired status changes do not remove member role.
+- Roles and permissions inside already issued access tokens remain until access token expiry.
+
+Security note:
+- Removing role is more disruptive.
+- Setting User.isActive=false and revoking sessions is safer and less likely to break admin workflows.
+
+
+7. Recommended Behavior For Each Status
+
+active:
+- User.isActive should be true.
+- Member role should exist if linked User exists.
+- Member portal access should be allowed.
+- Refresh sessions do not need to be revoked when moving into active unless a forced fresh login policy is desired.
+
+approved:
+- Treat as transitional/admin status unless business confirms it should allow portal login.
+- Safest default: User.isActive should be false.
+- Member portal should be blocked.
+- Refresh sessions should be revoked if linked User exists.
+
+pending:
+- User.isActive should be false if linked User exists.
+- Member portal should be blocked.
+- Refresh sessions should be revoked if linked User exists.
+
+correction_requested:
+- User.isActive should be false if linked User exists.
+- Member portal should be blocked.
+- Public correction-token flow can remain separate.
+- Refresh sessions should be revoked if linked User exists.
+
+inactive:
+- User.isActive should be false.
+- Member portal should be blocked.
+- Refresh sessions should be revoked.
+- Member record should remain manageable by admin.
+
+suspended:
+- User.isActive should be false.
+- Member portal should be blocked immediately.
+- Refresh sessions should be revoked.
+- Member record should remain manageable by admin.
+
+rejected:
+- User.isActive should be false if linked User exists.
+- Member portal should be blocked.
+- Refresh sessions should be revoked.
+- Member record/history should remain.
+- Removing member role can be considered later, but is not required for safest first fix.
+
+expired:
+- Current portal eligibility rule blocks expired members.
+- Safest default: User.isActive should be false.
+- Refresh sessions should be revoked.
+- If renewal recovery is required later, create a limited renewal-only flow instead of full portal access.
+
+
+8. Safest Behavior Without Breaking Admin Workflows
+
+Recommended safest behavior:
+- Do not delete User.
+- Do not delete Member.
+- Do not delete roles immediately.
+- Do not delete audit logs or status logs.
+- Do not block admin /api/members/* management endpoints.
+- When status changes to a blocked status, set linked User.isActive=false and revoke refresh sessions.
+- When status changes back to active, set linked User.isActive=true and ensure member role exists if User exists.
+
+Why this is safest:
+- Admin can still view and manage inactive/rejected/suspended members.
+- The member cannot log in or refresh sessions while blocked.
+- The system avoids destructive data loss.
+- Existing admin workflows are less likely to break.
+
+
+9. Exact Files That Need Changes Later
+
+Primary files:
+- apps/api/src/members/members.service.ts
+- apps/api/src/members/dto/update-member-status.dto.ts
+- apps/api/src/auth/auth.service.ts
+
+Related Prisma models to review:
+- User
+- Member
+- RefreshTokenSession
+- UserRoleAssignment
+- Role
+- Permission
+
+Prisma schema file for review only:
+- apps/api/prisma/schema.prisma
+
+Possible helper location:
+- apps/api/src/auth/member-access.service.ts
+- or new file: apps/api/src/auth/session-revocation.service.ts
+
+
+10. Risk Level
+
+Current risk level:
+- Medium to High
+
+Reason:
+- Member portal endpoint access is now blocked by centralized status eligibility.
+- However, linked User may remain active after status changes.
+- Refresh sessions may remain valid.
+- If future endpoints bypass member eligibility checks, stale active users could become a security risk.
+
+Implementation risk:
+- Medium
+
+Reason:
+- Changing User.isActive and revoking refresh sessions affects login and refresh behavior.
+- Need to avoid accidentally disabling admin users who also have member profiles.
+- Need to keep admin management workflows working.
+
+
+11. Safe Implementation Plan
+
+Step 1: Define portal-enabled statuses
+- Active should be the only clearly portal-enabled member status.
+
+Step 2: Add a status side-effect helper
+- Add helper method in MembersService or a dedicated auth/session helper.
+- Example:
+  syncUserAccessForMemberStatus(member, nextStatus, tx)
+
+Step 3: For blocked statuses
+- If member.userId exists:
+  - Set User.isActive=false.
+  - Revoke all non-revoked RefreshTokenSession records for that user.
+- Blocked statuses:
+  - pending
+  - under_review
+  - correction_requested
+  - approved
+  - rejected
+  - inactive
+  - suspended
+  - expired
+
+Step 4: For active status
+- If linked User exists:
+  - Set User.isActive=true.
+  - Ensure member role exists.
+- If no linked User exists:
+  - Do not auto-create User from generic updateStatus() unless business confirms.
+  - Keep approveApplication() responsible for account creation.
+
+Step 5: Apply helper in status-changing methods
+- updateStatus()
+- rejectApplication()
+- requestCorrection()
+- markUnderReview()
+- submitCorrection()
+- any other workflow transition that can move a member out of active.
+
+Step 6: Keep admin workflows unchanged
+- Admin endpoints should still list/view/update all members.
+- Admin should still manage rejected/inactive/suspended members.
+
+Step 7: Add tests
+- Active member can login and refresh.
+- Suspended member cannot refresh after status change.
+- Rejected member cannot login.
+- Admin can still view rejected/suspended members.
+- Status change to active re-enables linked User if present.
+- Refresh sessions are revoked on blocked status changes.
+
+
+Final Recommendation
+
+Do this as a backend-only follow-up fix.
+
+Recommended first safe fix:
+- Update member status transitions to sync linked User.isActive and revoke refresh sessions.
+- Do not remove member roles yet.
+- Do not auto-create users from generic updateStatus().
+- Keep approveApplication() as the only account creation flow.

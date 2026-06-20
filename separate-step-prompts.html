@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Membership Management System - Separate Step Prompts</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --paper: #ffffff;
+      --text: #17202a;
+      --muted: #667085;
+      --line: #d8dee8;
+      --accent: #0f766e;
+      --accent-dark: #115e59;
+      --code-bg: #111827;
+      --code-text: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, "Noto Sans Bengali", "Noto Sans", sans-serif;
+      line-height: 1.58;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 28px));
+      margin: 28px auto;
+    }
+
+    header,
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 28px rgba(16, 24, 40, 0.06);
+    }
+
+    header {
+      padding: 30px;
+    }
+
+    section {
+      overflow: hidden;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: clamp(28px, 4vw, 40px);
+      letter-spacing: 0;
+      line-height: 1.22;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      color: var(--muted);
+      max-width: 920px;
+      margin-bottom: 0;
+      font-size: 17px;
+    }
+
+    .note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      background: #ecfdf5;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 9px 13px;
+      color: #ffffff;
+      background: var(--accent);
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    pre {
+      margin: 0;
+      padding: 20px;
+      overflow: auto;
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    code {
+      font-family: Consolas, Monaco, monospace;
+    }
+
+    .toc {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .toc a {
+      display: block;
+      padding: 10px 12px;
+      color: var(--accent-dark);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      font-weight: 700;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      main {
+        width: 100%;
+        margin: 0;
+      }
+
+      button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Membership Management System - Separate Step Prompts</h1>
+      <p class="lead">
+        প্রতিটি prompt আলাদা chat-এ copy-paste করার মতো করে লেখা। Step 00 দিয়ে project শুরু করুন, তারপর ধাপে ধাপে পরের prompt দিন। কোনো prompt-ই demo system বানানোর জন্য নয়।
+      </p>
+      <div class="note">
+        <strong>Rule:</strong> প্রতিটি নতুন chat-এ prompt paste করার আগে existing project folder attach/open করে দিন। Agent-কে বলুন repo inspect করে তারপর কাজ করতে।
+      </div>
+      <div class="toc">
+        <a href="#p00">Step 00 - Project Foundation</a>
+        <a href="#p01">Step 01 - Auth, Roles, Permissions</a>
+        <a href="#p02">Step 02 - Core Member Schema</a>
+        <a href="#p03">Step 03 - Dynamic Form Builder</a>
+        <a href="#p04">Step 04 - Registration Approval</a>
+        <a href="#p05">Step 05 - Membership Renewal</a>
+        <a href="#p06">Step 06 - Public Website</a>
+        <a href="#p07">Step 07 - Member Dashboard</a>
+        <a href="#p08">Step 08 - Committee Management</a>
+        <a href="#p09">Step 09 - Notice And Event</a>
+        <a href="#p10">Step 10 - Finance Basic</a>
+        <a href="#p11">Step 11 - ID Card, QR, Reports</a>
+        <a href="#p12">Step 12 - Gallery, Settings, Audit</a>
+        <a href="#p13">Step 13 - Election Advanced</a>
+        <a href="#p14">Step 14 - Final QA And Deploy</a>
+      </div>
+    </header>
+
+    <section id="p00">
+      <div class="section-head">
+        <h2>Step 00 - Project Foundation</h2>
+        <button data-copy="prompt-00">Copy Prompt</button>
+      </div>
+      <pre id="prompt-00">You are a senior full-stack engineer. Start building a production-grade single-organization Membership Management System. This is NOT SaaS and NOT a demo.
+
+Use this exact stack:
+- Frontend: Next.js with TypeScript
+- Backend: NestJS with TypeScript
+- Database: PostgreSQL
+- ORM: Prisma
+- UI: Tailwind CSS with shadcn/ui-style reusable components
+- Auth later: JWT access token plus refresh token
+- Deployment: Docker Compose on VPS
+
+First inspect the current project folder. If it is empty, scaffold the project. If files already exist, preserve existing work and continue cleanly.
+
+Create this monorepo:
+membership-management-system/
+  apps/
+    web/
+    api/
+  packages/
+    shared/
+  docker-compose.yml
+  README.md
+
+Implement:
+1. Next.js app in apps/web with TypeScript, Tailwind, basic layout, routing structure for public, member, and admin areas.
+2. NestJS app in apps/api with module-based structure.
+3. Prisma setup connected to PostgreSQL.
+4. Docker Compose with PostgreSQL, API, and web services.
+5. Environment files/examples for local setup.
+6. Shared package for constants/types.
+7. Lint/typecheck/build scripts.
+8. README with exact local run commands.
+
+Do not build fake UI only. The foundation must actually run.
+
+Verification before finishing:
+- docker compose starts PostgreSQL
+- API can connect to database
+- Prisma migration works
+- Web app starts
+- API health endpoint works
+- README is updated</pre>
+    </section>
+
+    <section id="p01">
+      <div class="section-head">
+        <h2>Step 01 - Auth, Roles, Permissions</h2>
+        <button data-copy="prompt-01">Copy Prompt</button>
+      </div>
+      <pre id="prompt-01">Continue the existing Membership Management System project. First inspect the repo and current schema before editing. Do not rewrite working code unnecessarily.
+
+Build a real authentication, role, and permission foundation. This is a production-grade system, not a demo.
+
+Required roles:
+- Super Admin
+- Admin
+- Accountant
+- Committee Manager
+- Content Manager
+- Election Officer
+- Member
+
+Implement backend:
+1. Prisma models for users, roles, permissions, user_roles, role_permissions, refresh tokens/sessions, and audit_logs.
+2. Secure password hashing.
+3. Admin login endpoint.
+4. Member login endpoint structure, even if member activation comes later.
+5. JWT access token and refresh token flow.
+6. Logout/revoke refresh token.
+7. Auth guards in NestJS.
+8. Permission guard/decorator for module/action permissions.
+9. Seed initial roles, permissions, and one Super Admin from environment variables.
+10. Audit log service for important actions.
+
+Implement frontend:
+1. Admin login page.
+2. Member login page.
+3. Protected admin layout.
+4. Protected member layout.
+5. Token/session handling.
+6. Logout button.
+7. Unauthorized and forbidden states.
+
+Security rules:
+- Never store plain passwords.
+- Do not expose refresh tokens to unsafe client code.
+- Validate DTOs.
+- Use clear error messages without leaking sensitive details.
+
+Verification:
+- Can seed Super Admin
+- Can login as Super Admin
+- Can access protected admin route
+- Cannot access protected routes without login
+- Permission guard works
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p02">
+      <div class="section-head">
+        <h2>Step 02 - Core Member Schema</h2>
+        <button data-copy="prompt-02">Copy Prompt</button>
+      </div>
+      <pre id="prompt-02">Continue the existing Membership Management System. Inspect current code, migrations, and auth before editing.
+
+Build the core member and membership database foundation. This is single organization only, not SaaS.
+
+Implement Prisma models and backend modules for:
+- members
+- membership_types
+- member_status_logs
+- member_documents
+- settings if not already present
+
+Member core fields must include:
+- id
+- user_id nullable until approval/login creation
+- member_id unique nullable until approval
+- full_name
+- email
+- phone
+- photo
+- status: pending, under_review, correction_requested, approved, rejected, active, inactive, suspended, expired
+- membership_type_id
+- approval/rejection/correction metadata
+- joined_at
+- approved_at
+- expired_at
+- created_at, updated_at
+
+Membership type fields:
+- name
+- code
+- description
+- renewal_required
+- renewal_fee
+- renewal_cycle
+- grace_period_days
+- directory_visible_when_expired
+- monthly_chanda_required
+- monthly_chanda_amount
+- active
+
+Build backend APIs:
+- CRUD membership types
+- List members with pagination/filter/search
+- Get member details
+- Update member status internally with status log
+
+Build admin frontend:
+- Membership type management page
+- Member list page with search/filter/status badge
+- Member details page skeleton showing core fields and status history
+
+Rules:
+- Preserve member records. Do not hard delete members.
+- Use audit log for admin changes.
+- Use permissions for admin access.
+
+Verification:
+- Migration works
+- Membership type CRUD works
+- Member list endpoint works
+- Admin UI can view membership types and member list
+- Typecheck/build passes</pre>
+    </section>
+
+    <section id="p03">
+      <div class="section-head">
+        <h2>Step 03 - Dynamic Form Builder</h2>
+        <button data-copy="prompt-03">Copy Prompt</button>
+      </div>
+      <pre id="prompt-03">Continue the existing Membership Management System. Inspect current schema and UI before editing.
+
+Build the Dynamic Form Builder. This is one of the most important modules. Registration fields must not be hardcoded except core identity fields.
+
+Implement database models:
+- form_sections
+- form_fields
+- member_form_values
+
+Supported field types:
+- text
+- textarea
+- number
+- date
+- email
+- phone
+- dropdown
+- radio
+- checkbox
+- file
+- image
+- document
+
+Field settings:
+- section_id
+- label
+- key/name
+- placeholder
+- help_text
+- type
+- required
+- public_visible
+- member_editable
+- admin_only
+- membership_type_specific
+- membership_type_ids if needed
+- validation_rules as JSON
+- options as JSON
+- sort_order
+- active
+
+Backend:
+1. CRUD form sections.
+2. CRUD form fields.
+3. Reorder sections and fields.
+4. Endpoint to get active public registration form.
+5. Endpoint to validate dynamic form submission.
+6. File/document upload validation and storage.
+
+Frontend admin:
+1. Form builder page.
+2. Create/edit/delete/reorder sections.
+3. Create/edit/delete/reorder fields.
+4. Options editor for dropdown/radio/checkbox.
+5. Required/public/private/member-editable toggles.
+
+Frontend public:
+1. Render dynamic registration form from API.
+2. Client-side validation based on field rules.
+3. File upload input for file/image/document fields.
+
+Rules:
+- Store custom submitted data in member_form_values or a queryable equivalent.
+- Do not expose private/admin-only fields publicly.
+- Preserve field label/key snapshot where useful for history.
+- Audit log changes to form fields.
+
+Verification:
+- Admin can create sections and fields
+- Public registration form renders dynamic fields
+- Required validation works
+- File field validation works
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p04">
+      <div class="section-head">
+        <h2>Step 04 - Registration Approval</h2>
+        <button data-copy="prompt-04">Copy Prompt</button>
+      </div>
+      <pre id="prompt-04">Continue the existing Membership Management System. Inspect current form builder, member schema, and auth before editing.
+
+Build full public registration and admin approval workflow. This must be fully functional, not a placeholder.
+
+Workflow:
+1. Public visitor submits registration form.
+2. System creates pending member/application.
+3. Admin can view pending applications.
+4. Admin can mark under_review.
+5. Admin can approve application.
+6. Admin can reject with reason.
+7. Admin can request correction with message and optional field/document list.
+8. Applicant/member can submit correction.
+9. On approval, generate unique member ID.
+10. On approval, create/enable member login account.
+
+Backend:
+- Public registration endpoint
+- Upload document/photo endpoint if not already complete
+- Pending application list
+- Application details with core and dynamic fields
+- Approve endpoint
+- Reject endpoint
+- Request correction endpoint
+- Submit correction endpoint
+- Member ID generation service
+- Optional temporary password or account activation flow
+- Status logs and audit logs
+
+Frontend:
+- Public registration page connected to API
+- Registration success page
+- Admin pending applications page
+- Admin application details page
+- Approve/reject/correction action modals
+- Correction submission page or member-accessible correction flow
+
+Rules:
+- Approved member becomes active unless membership policy says otherwise.
+- Rejected applications remain in admin record.
+- Correction history must be visible to admin.
+- Do not lose submitted dynamic form data.
+- Do not generate duplicate member IDs.
+
+Verification:
+- Public registration creates pending application
+- Admin can approve and member ID is generated
+- Approved member can login
+- Admin can reject with reason
+- Admin can request correction and applicant can resubmit
+- Audit logs are created
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p05">
+      <div class="section-head">
+        <h2>Step 05 - Membership Renewal</h2>
+        <button data-copy="prompt-05">Copy Prompt</button>
+      </div>
+      <pre id="prompt-05">Continue the existing Membership Management System. Inspect existing member, membership type, payment, and settings code before editing.
+
+Build membership renewal and monthly chanda rules.
+
+Required membership type rules:
+- renewal_required yes/no
+- renewal_fee
+- renewal_cycle: monthly/yearly/custom
+- grace_period_days
+- directory_visible_when_expired
+- monthly_chanda_required yes/no
+- monthly_chanda_amount
+
+Implement:
+1. Renewal period calculation.
+2. Member expiry date management.
+3. Renewal status service.
+4. Chanda due calculation service.
+5. Directory visibility logic for expired/non-renewed members.
+6. Admin renewal settings page.
+7. Admin member renewal view.
+8. Member dashboard renewal/chanda summary.
+
+Rules:
+- If renewal is required and member does not renew, member can be hidden from public directory based on settings.
+- Expired member remains in admin panel.
+- Lifetime/honorary/non-renewal members remain visible if active.
+- Renewal/chanda logic should be service-based and testable.
+
+Verification:
+- Renewal required member shows due/expired correctly
+- Non-renewal member does not expire due to renewal
+- Directory hides expired member when configured
+- Admin can view renewal state
+- Member can view renewal/chanda status
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p06">
+      <div class="section-head">
+        <h2>Step 06 - Public Website</h2>
+        <button data-copy="prompt-06">Copy Prompt</button>
+      </div>
+      <pre id="prompt-06">Continue the existing Membership Management System. Inspect current frontend routes and backend APIs before editing.
+
+Build the public website. It must be real and connected to the backend.
+
+Pages:
+- Home
+- About
+- Member Directory
+- Current Committees placeholder route if committee is not implemented yet
+- Previous Committees placeholder route if committee is not implemented yet
+- Notices
+- Notice Details
+- Events
+- Event Details
+- Gallery
+- Donation
+- Election Results
+- Member QR Verification
+- Registration
+- Login
+
+Public features:
+1. Responsive public layout with header/footer/navigation.
+2. Homepage sections: slider/banner, organization message, current committee preview, notices/events preview, sponsors.
+3. Member directory with search/filter/pagination.
+4. Respect public/private dynamic field visibility.
+5. Respect expired member hide rule.
+6. Member verification page by QR/token/member ID route.
+7. Public notice/event listings connected to API if modules exist; otherwise create backend-ready structure and empty states.
+
+Rules:
+- Do not expose private member data.
+- Do not show expired/non-renewed members if settings say hide.
+- Do not build static fake public pages; use API data and proper empty states.
+- Keep SEO-friendly public pages where practical.
+
+Verification:
+- Public pages load
+- Member directory searches real members
+- Private fields are hidden
+- QR verification shows safe member data only
+- Responsive layout works
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p07">
+      <div class="section-head">
+        <h2>Step 07 - Member Dashboard</h2>
+        <button data-copy="prompt-07">Copy Prompt</button>
+      </div>
+      <pre id="prompt-07">Continue the existing Membership Management System. Inspect auth, member schema, registration, renewal, and frontend layout before editing.
+
+Build the member dashboard as a real self-service area.
+
+Member pages:
+- Dashboard
+- Profile
+- Registration Details
+- Renewal Status
+- Chanda Status
+- Payment History
+- Donation History
+- Event Registrations
+- Notices
+- Committee History
+- ID Card
+- Certificates
+
+Implement backend APIs:
+- Current member profile
+- Current member dynamic registration data
+- Current member renewal/chanda summary
+- Current member payment history endpoint structure
+- Current member notices endpoint structure
+- Current member committee history endpoint structure
+
+Implement frontend:
+1. Member dashboard overview cards.
+2. Profile page showing core fields.
+3. Registration details page showing dynamic form values.
+4. Renewal/chanda status page.
+5. Payment/donation/event/notice pages with real endpoints and empty states.
+6. ID card page route ready for ID card module.
+
+Rules:
+- Member can only view their own data.
+- Member cannot access admin-only/private fields unless allowed.
+- Direct profile editing should follow settings; if not allowed, provide update request structure or read-only UI.
+- Use protected member layout.
+
+Verification:
+- Approved member can login and open dashboard
+- Member only sees own data
+- Dynamic registration values display correctly
+- Renewal/chanda summary displays correctly
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p08">
+      <div class="section-head">
+        <h2>Step 08 - Committee Management</h2>
+        <button data-copy="prompt-08">Copy Prompt</button>
+      </div>
+      <pre id="prompt-08">Continue the existing Membership Management System. Inspect current member and public website code before editing.
+
+Build committee management with historical archive.
+
+Committee types:
+- Central Committee
+- Executive Committee
+- Advisory Committee
+- Election Committee
+- District Committee
+- Country Chapter Committee
+- City Committee
+- Branch Committee
+- Custom Committee
+
+Implement models:
+- committee_types
+- committees
+- committee_terms
+- committee_positions
+- committee_members
+
+Features:
+1. Admin CRUD committee types.
+2. Admin create committee and term, for example 2020-2022 or 2026-2028.
+3. Admin create positions.
+4. Admin assign members to term positions.
+5. One member can serve multiple terms and different positions.
+6. Current committee detection.
+7. Previous committee archive.
+8. Member committee history.
+9. Public current committee page.
+10. Public previous committee page.
+
+Rules:
+- Never delete historical committee records when term ends.
+- Archive term instead of deleting.
+- Use audit log for assignment changes.
+
+Verification:
+- Admin can create committee term and assign members
+- Public current committee page works
+- Previous committee archive works
+- Member dashboard shows committee history
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p09">
+      <div class="section-head">
+        <h2>Step 09 - Notice And Event</h2>
+        <button data-copy="prompt-09">Copy Prompt</button>
+      </div>
+      <pre id="prompt-09">Continue the existing Membership Management System. Inspect existing public, admin, and member layouts before editing.
+
+Build notice and event modules with real database persistence and visibility rules.
+
+Notice fields:
+- title
+- slug
+- content
+- category/type
+- attachment
+- visibility: public, members_only, committee_wise, district_wise, country_wise, membership_type_wise, specific_group
+- status: draft, published, archived
+- publish_date
+
+Event fields:
+- title
+- slug
+- description
+- event type
+- start/end date
+- venue
+- visibility
+- registration_open_at
+- registration_close_at
+- fee
+- guest_count_allowed
+- status
+
+Event features:
+- Member event registration
+- Guest count
+- Manual event payment record structure
+- QR ticket basic
+- Attendance check-in basic
+- Event registration report
+
+Implement admin UI:
+- Notice CRUD
+- Publish/archive actions
+- Event CRUD
+- Event registrations list
+- Attendance check-in page/basic scanner-friendly code entry
+
+Implement public/member UI:
+- Public notices/events
+- Notice/event details
+- Member-only notice access
+- Member event registration
+- Member event registration history
+
+Rules:
+- Respect notice/event visibility.
+- Public users cannot access member-only content.
+- Use audit logs for publish/archive.
+
+Verification:
+- Admin can publish notice
+- Public notice appears publicly
+- Member-only notice requires login
+- Member can register for event
+- Event registration persists
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p10">
+      <div class="section-head">
+        <h2>Step 10 - Finance Basic</h2>
+        <button data-copy="prompt-10">Copy Prompt</button>
+      </div>
+      <pre id="prompt-10">Continue the existing Membership Management System. Inspect member, renewal, and event modules before editing.
+
+Build basic finance tracking. This must persist real payment and donation records.
+
+Payment categories:
+- Membership fee
+- Renewal fee
+- Monthly chanda
+- Donation
+- Event fee
+- Sponsorship
+- Other income
+- Expense
+
+Payment fields:
+- payer type: member, non_member, company
+- member_id nullable
+- payer name/contact
+- amount
+- payment method: cash, bank, bKash, Nagad, Rocket, other
+- account_id
+- transaction/reference number
+- payment date
+- status: pending, approved, rejected, refunded
+- receipt number
+- notes
+
+Accounts:
+- Cash account
+- Bank account
+- Mobile banking account
+- Petty cash account
+
+Implement:
+1. Prisma models for payments, donations, accounts, account_transactions.
+2. Receipt number generation.
+3. Admin payment CRUD/approval.
+4. Member payment history.
+5. Donation entry for member/non-member/company.
+6. Basic account balance update rules.
+7. Basic income/expense entry.
+8. Reports: collection, donation, renewal due, chanda due.
+
+Rules:
+- Use permissions for finance access.
+- Use audit log for approval/rejection.
+- Do not delete approved financial records; void/reverse if needed.
+
+Verification:
+- Admin can enter payment
+- Payment approval updates status/account transaction
+- Member sees payment history
+- Donation receipt data exists
+- Basic reports show real data
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p11">
+      <div class="section-head">
+        <h2>Step 11 - ID Card, QR, Reports</h2>
+        <button data-copy="prompt-11">Copy Prompt</button>
+      </div>
+      <pre id="prompt-11">Continue the existing Membership Management System. Inspect member, public verification, and finance modules before editing.
+
+Build ID card, QR verification, and export reports.
+
+ID card must include:
+- Member photo
+- Member name
+- Member ID
+- Membership type
+- Status
+- Expiry date if applicable
+- Committee position optional
+- QR code
+
+QR rule:
+- QR opens public verification page.
+- Verification page shows safe information only: name, member ID, membership type, status, validity/expiry, photo if allowed.
+- Do not expose private dynamic fields or documents.
+
+Implement:
+1. ID card template settings basic.
+2. Generate ID card view/download as PDF or image.
+3. QR token generation.
+4. Public verification endpoint and page.
+5. Admin regenerate ID card/QR action.
+6. Member ID card page.
+7. Excel exports for members, payments, donations, event registrations.
+8. PDF exports where practical for reports.
+
+Reports:
+- Member list
+- Pending applications
+- Approved members
+- Expired members
+- Renewal due
+- Chanda due
+- Payment collection
+- Donation
+- Event registration
+- Committee members
+
+Verification:
+- ID card renders for approved member
+- QR verification works
+- Private data is not exposed
+- Excel export downloads real data
+- Reports filter correctly
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p12">
+      <div class="section-head">
+        <h2>Step 12 - Gallery, Settings, Audit</h2>
+        <button data-copy="prompt-12">Copy Prompt</button>
+      </div>
+      <pre id="prompt-12">Continue the existing Membership Management System. Inspect current content/public/admin modules before editing.
+
+Build gallery, site content settings, system settings, and audit log UI.
+
+Gallery:
+- Albums
+- Photos
+- Videos or video links
+- Sort order
+- Public/private status
+- Featured flag
+
+Homepage/content settings:
+- Organization name
+- Logo
+- Address/contact
+- Homepage slider/banner
+- President/organization message
+- Sponsor banner
+- Social links
+- Footer content
+
+System settings:
+- Member ID prefix/rule
+- Receipt prefix/rule
+- Directory visibility defaults
+- Upload limits
+- Public/private profile defaults
+
+Audit UI:
+- List audit logs
+- Filter by actor, module, action, date
+- Show before/after metadata where available
+
+Implement admin UI:
+- Gallery album/item management
+- Settings pages
+- Audit logs page
+
+Implement public UI:
+- Gallery page
+- Homepage uses configured content
+- Footer/header uses settings
+
+Rules:
+- Settings must be persisted in database.
+- File uploads must be validated.
+- Audit logs should be read-only.
+
+Verification:
+- Admin can update settings
+- Public site reflects settings
+- Gallery works
+- Audit log filters work
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p13">
+      <div class="section-head">
+        <h2>Step 13 - Election Advanced</h2>
+        <button data-copy="prompt-13">Copy Prompt</button>
+      </div>
+      <pre id="prompt-13">Continue the existing Membership Management System. Inspect member, auth, permission, and audit modules before editing.
+
+Build the online election/voting module. Voting secrecy is critical.
+
+Election features:
+- Election create
+- Position create
+- Candidate nomination
+- Panel/group support
+- Independent candidate
+- Eligibility rule
+- Voter list
+- One member one vote per election/position as configured
+- Secret vote storage
+- Admin can see who voted
+- Admin cannot see who voted for whom
+- Position-wise result
+- Panel-wise result
+- Result publish
+- Election archive
+
+Implement models:
+- elections
+- election_positions
+- election_candidates
+- election_panels
+- election_voters
+- election_votes
+
+Backend:
+1. Admin election CRUD.
+2. Position CRUD.
+3. Candidate CRUD and panel assignment.
+4. Eligibility service based on member status, membership type, renewal status, and custom rules.
+5. Voter list generation.
+6. Voting endpoint for eligible logged-in member.
+7. Prevent duplicate vote.
+8. Secret ballot design so voter identity is not stored with candidate choice in a way admin UI can reveal.
+9. Result calculation.
+10. Result publish/archive.
+
+Frontend:
+- Admin election management
+- Candidate management
+- Voter turnout page
+- Result page
+- Member voting page
+- Public result page when published
+
+Security:
+- Strictly protect vote endpoint.
+- Prevent double voting.
+- Do not expose vote choice per voter.
+- Audit election admin actions, not ballot choices.
+
+Verification:
+- Eligible member can vote once
+- Ineligible member cannot vote
+- Admin can see turnout
+- Admin cannot see individual vote choices
+- Published result works
+- Build/typecheck passes</pre>
+    </section>
+
+    <section id="p14">
+      <div class="section-head">
+        <h2>Step 14 - Final QA And Deploy</h2>
+        <button data-copy="prompt-14">Copy Prompt</button>
+      </div>
+      <pre id="prompt-14">Continue the existing Membership Management System. Perform final QA, hardening, documentation, and deployment preparation. Do not add large new features unless required to fix incomplete flows.
+
+Inspect the full repo and verify all implemented modules:
+- Auth
+- Roles/permissions
+- Dynamic form builder
+- Registration approval
+- Member dashboard
+- Membership/renewal
+- Public website
+- Member directory
+- Committee
+- Notice/event
+- Finance basic
+- ID card/QR
+- Gallery/settings
+- Reports
+- Audit logs
+- Election if implemented
+
+Tasks:
+1. Run migrations from clean database.
+2. Run seed from clean database.
+3. Run lint/typecheck/build for web and API.
+4. Fix broken imports, routes, DTOs, permissions, and schema mismatches.
+5. Verify end-to-end flows manually:
+   - Super Admin login
+   - Create membership type
+   - Build registration form
+   - Public registration
+   - Admin approve
+   - Member login
+   - Member appears in directory
+   - Member dashboard works
+   - Committee assignment works
+   - Notice/event publish works
+   - Payment entry works
+   - ID card QR verification works
+6. Add missing empty/loading/error states.
+7. Confirm private fields are not exposed publicly.
+8. Confirm expired member directory visibility rule.
+9. Update README with deployment and backup notes.
+10. Ensure Docker Compose is production-ready enough for VPS.
+
+Deliver:
+- A working full system
+- Clean README
+- Environment variable examples
+- Migration/seed instructions
+- Known limitations list only if something truly remains unfinished
+
+Do not claim completion unless the main workflows work end to end.</pre>
+    </section>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll("[data-copy]");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", async () => {
+        const id = button.getAttribute("data-copy");
+        const text = document.getElementById(id).innerText;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          const previous = button.innerText;
+          button.innerText = "Copied";
+          setTimeout(() => {
+            button.innerText = previous;
+          }, 1400);
+        } catch (error) {
+          const range = document.createRange();
+          range.selectNodeContents(document.getElementById(id));
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          button.innerText = "Selected";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

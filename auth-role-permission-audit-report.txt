@@ -1,0 +1,381 @@
+Membership Management System
+Auth and Role Permission Audit Report
+Date: 2026-06-21
+Scope: Authentication and authorization structure only
+
+Important note:
+- No code was changed for this audit.
+- UI, business logic, and database schema were not changed.
+
+
+A. Current Auth Structure Summary
+
+Backend auth is centralized under:
+- apps/api/src/auth/auth.controller.ts
+- apps/api/src/auth/auth.service.ts
+- apps/api/src/auth/jwt-auth.guard.ts
+- apps/api/src/auth/permission.guard.ts
+- apps/api/src/auth/permissions.decorator.ts
+
+Login endpoints:
+- POST /api/auth/admin/login
+- POST /api/auth/member/login
+
+Session/token structure:
+- Access token is a JWT sent through Authorization: Bearer <token>.
+- Refresh token is stored in an HTTP-only cookie named mms_refresh_token.
+- Refresh token sessions are stored in the database with SHA-256 token hash.
+- Refresh token rotation exists.
+- Logout clears the refresh cookie and revokes matching refresh session.
+
+Password hashing:
+- bcryptjs is used.
+- Password hash salt round is 12.
+
+Frontend auth storage:
+- Access token is stored in browser localStorage.
+- Storage key: mms_access_token.
+- Frontend auth client file: apps/web/lib/auth-client.ts.
+
+Frontend route protection:
+- Admin routes use ProtectedArea through apps/web/app/admin/layout.tsx.
+- Member routes use ProtectedArea through apps/web/components/member/member-layout-content.tsx.
+- Protection is mainly client-side.
+- Backend API guards are the real security boundary.
+
+
+B. List Of Protected Routes
+
+Frontend protected routes:
+- /admin/*
+- /member/*
+
+Frontend protection files:
+- apps/web/app/admin/layout.tsx
+- apps/web/app/member/layout.tsx
+- apps/web/components/member/member-layout-content.tsx
+- apps/web/components/auth/protected-area.tsx
+
+Backend protected admin/member endpoints:
+- /api/auth/me
+- /api/auth/change-password
+- /api/auth/admin/protected
+- /api/auth/admin/permission-check
+- /api/members/*
+- /api/member/*
+- /api/member/chat/*
+- /api/admin/website/*
+- /api/form-builder/*
+- /api/membership-types/*
+- /api/renewals/*
+
+Backend guard pattern:
+- JwtAuthGuard validates access token.
+- PermissionGuard checks required permission.
+- RequirePermission(module, action) defines permission requirement.
+
+
+C. List Of Public Routes
+
+Frontend public routes:
+- /
+- /about
+- /members
+- /gallery
+- /smritir-pata
+- /events
+- /notices
+- /register
+- /register/success
+- /login
+- /member/login
+- /admin/login
+- /reset-password
+- /verify
+- /verify/[identifier]
+- /corrections/[token]
+- /unauthorized
+- /forbidden
+
+Backend public endpoints:
+- GET /api/health
+- GET /api/public/site
+- GET /api/public/navigation
+- GET /api/public/pages/:key
+- GET /api/public/notices
+- GET /api/public/notices/:slug
+- GET /api/public/events
+- GET /api/public/events/:slug
+- GET /api/public/srithir-patha
+- GET /api/public/srithir-patha/:slug
+- GET /api/public/smritir-pata
+- GET /api/public/smritir-pata/:slug
+- GET /api/public/smritir-pata/:slug/comments
+- GET /api/public/gallery
+- GET /api/public/home-hero-slides
+- GET /api/public/alumni-voices
+- GET /api/public/testimonials
+- GET /api/public/donations
+- GET /api/public/election-results
+- GET /api/public/committees/current
+- GET /api/public/committees/previous
+- GET /api/public/directory
+- GET /api/public/directory/verify/:identifier
+- GET /api/public/registration-form
+- GET /api/public/forms/:code
+- POST /api/public/registration-form/validate
+- POST /api/public/registration-form/submit
+- POST /api/public/registration-form/uploads/:fieldKey
+- GET /api/public/applications/:token/correction-form
+- POST /api/public/applications/:token/corrections
+
+
+D. List Of Risky Routes / Endpoints
+
+Risk level: High
+
+1. POST /api/public/registration-form/uploads/:fieldKey
+- Public file upload endpoint.
+- Has file size limit, but public upload always carries abuse risk.
+- Needs file type validation, rate limiting, malware scanning or stricter storage rules.
+
+2. POST /api/public/smritir-pata/:slug/comments
+- Uses JwtAuthGuard only.
+- Service checks user/member/admin, but controller-level permission is weaker.
+- Safer structure: use JwtAuthGuard + PermissionGuard or explicit comment permission.
+
+3. POST /api/public/smritir-pata/comments/:id/hide
+- Uses JwtAuthGuard only.
+- Ownership check exists in service.
+- Controller-level authorization is still weaker than the rest of the app.
+
+4. POST /api/public/smritir-pata/comments/:id/delete
+- Uses JwtAuthGuard only.
+- Ownership check exists in service.
+- Should be reviewed for consistent authorization policy.
+
+5. /reset-password frontend route
+- Page exists.
+- No real backend password reset endpoint was found.
+- Currently behaves like placeholder UI only.
+
+6. /admin/* and /member/* frontend routes
+- Client-side ProtectedArea guards them.
+- No strong server-side Next.js session middleware was found for these routes.
+- Backend APIs remain protected, but protected page shell can still load before redirect.
+
+
+E. Missing Guards Or Weak Protection
+
+1. No global auth guard
+- Guards are applied per controller or per method.
+- This is workable, but creates risk of future endpoints being added without guards.
+
+2. JwtAuthGuard does not re-check database user status
+- It validates JWT only.
+- If a user is disabled after login, their access token can remain valid until expiry.
+
+3. Permission changes are not immediate
+- Roles and permissions are embedded in JWT.
+- If admin removes a permission, old token can still work until expiry or refresh.
+
+4. Comment endpoints use weaker controller-level policy
+- Some comment actions use JwtAuthGuard but not PermissionGuard.
+- Service ownership checks reduce risk, but policy is inconsistent.
+
+5. No rate limiting found
+- Login, refresh, public registration, public upload, and correction-token endpoints should have rate limits.
+
+6. Broad admin permission
+- Many admin website endpoints use admin:access.
+- This is simple but less granular than content/media/gallery-specific permissions.
+
+
+F. Token / Session Storage Risk
+
+Risk level: Medium to High
+
+Current frontend access token storage:
+- localStorage key: mms_access_token.
+- File: apps/web/lib/auth-client.ts.
+
+Risk:
+- localStorage token can be stolen if XSS happens.
+- Access token is short-lived, but still usable while valid.
+
+Good points:
+- Refresh token is HTTP-only.
+- Refresh token is stored in database as hash.
+- Refresh token rotation exists.
+- Production cookie uses secure flag when NODE_ENV is production.
+- Cookie sameSite is lax.
+
+Remaining concern:
+- No CSRF token was found for refresh/logout endpoints.
+- sameSite lax helps, but CSRF-specific protection would be stronger.
+
+
+G. Role Permission Issues
+
+Good structure:
+- PermissionGuard exists.
+- RequirePermission decorator exists.
+- super-admin bypass exists.
+- Admin login checks admin:access or super-admin.
+- Member login checks member:access.
+
+Issues:
+- Permissions are stored inside JWT claims, so revocation is delayed.
+- Some endpoints use broad admin:access instead of feature-specific permissions.
+- Public comment endpoints are not using PermissionGuard consistently.
+- No obvious centralized policy registry was found to map every endpoint to required permission.
+
+
+H. Account Approval / Rejection Access Risk
+
+Risk level: High
+
+Observed approval flow:
+- Approved member gets a linked user account.
+- User is set isActive: true.
+- Member role is assigned.
+- Member status becomes active.
+- Temporary password is generated.
+- mustChangePassword is set true.
+
+Main concern:
+- Member self-service endpoints call loadOwnMember(user.id).
+- loadOwnMember only checks that a member profile exists for userId.
+- It does not clearly enforce allowed statuses like active/approved.
+
+Potential risk:
+- If a member becomes inactive, suspended, rejected, or expired, but the linked User remains active and still has member:access, they may still access many /api/member/* endpoints.
+
+Stronger checks exist in some places:
+- Chat service checks approved/active status more strongly.
+- But other member services are not consistently enforcing member status.
+
+Status update concern:
+- updateStatus changes member.status.
+- It does not clearly deactivate linked User.
+- It does not clearly remove member role.
+- It does not clearly revoke refresh sessions.
+
+Recommended direction:
+- Centralize member account eligibility check.
+- Enforce it in all /api/member/* controllers/services.
+- Revoke sessions or deactivate user when status becomes suspended/inactive/rejected.
+
+
+I. Recommended Fix Order
+
+1. Add centralized member access eligibility check.
+- Example allowed statuses: active, approved if business requires.
+- Block inactive, suspended, rejected, pending, correction_requested.
+
+2. Apply member status enforcement to all /api/member/* self-service endpoints.
+- apps/api/src/members/members.service.ts
+- apps/api/src/public-content/public-content.service.ts
+- apps/api/src/renewals/renewals.service.ts
+- apps/api/src/chat/chat.service.ts
+
+3. Update member status change behavior.
+- When member is suspended/inactive/rejected, deactivate linked user or revoke sessions.
+- Decide exact business rule before applying.
+
+4. Re-check user status in auth guard or add stricter guard.
+- Prevent disabled users from continuing with still-valid access tokens.
+
+5. Add rate limiting.
+- Login
+- Refresh
+- Registration submit
+- Public file upload
+- Correction token endpoints
+
+6. Make comment endpoints authorization consistent.
+- Add PermissionGuard or explicit decorator/policy.
+
+7. Improve frontend route protection.
+- Add server-aware middleware/session handling later.
+- Keep backend as primary enforcement.
+
+8. Replace localStorage token strategy later.
+- Prefer HTTP-only cookie/session strategy if possible.
+
+9. Implement real password reset flow or remove placeholder link.
+- Current reset page has no real backend flow.
+
+10. Add security tests.
+- Login success/failure
+- Admin-only endpoint denial for member
+- Member-only endpoint denial for admin without member access
+- Suspended/inactive member access denial
+- Rejected member access denial
+- Token refresh after role/status change
+
+
+J. Exact Files That Need Review / Change Later
+
+Backend auth files:
+- apps/api/src/auth/auth.controller.ts
+- apps/api/src/auth/auth.service.ts
+- apps/api/src/auth/jwt-auth.guard.ts
+- apps/api/src/auth/permission.guard.ts
+- apps/api/src/auth/permissions.decorator.ts
+- apps/api/src/auth/current-user.decorator.ts
+- apps/api/src/auth/auth.types.ts
+
+Backend member/status files:
+- apps/api/src/members/members.controller.ts
+- apps/api/src/members/members.service.ts
+- apps/api/src/members/dto/update-member-status.dto.ts
+- apps/api/src/renewals/renewals.controller.ts
+- apps/api/src/renewals/renewals.service.ts
+- apps/api/src/chat/chat.controller.ts
+- apps/api/src/chat/chat.service.ts
+
+Backend public/content files:
+- apps/api/src/public-content/public-content.controller.ts
+- apps/api/src/public-content/public-content.service.ts
+- apps/api/src/form-builder/form-builder.controller.ts
+- apps/api/src/form-builder/form-builder.service.ts
+
+Backend app/security config:
+- apps/api/src/main.ts
+- apps/api/src/app.module.ts
+
+Frontend auth files:
+- apps/web/lib/auth-client.ts
+- apps/web/components/auth/protected-area.tsx
+- apps/web/components/auth/login-form.tsx
+- apps/web/components/auth/logout-button.tsx
+- apps/web/components/member/member-layout-content.tsx
+- apps/web/app/admin/layout.tsx
+- apps/web/app/member/layout.tsx
+- apps/web/middleware.ts
+
+Frontend password reset:
+- apps/web/app/reset-password/page.tsx
+
+Shared auth constants/types:
+- packages/shared/src/constants.ts
+- packages/shared/src/types.ts
+
+
+Overall Security Risk Level
+
+High.
+
+Reason:
+- Core JWT and password hashing structure is acceptable.
+- Backend permissions are mostly present.
+- But account status enforcement is not consistently centralized.
+- localStorage token storage increases XSS impact.
+- Public upload and auth endpoints need rate limiting.
+- Some endpoints have weaker controller-level authorization consistency.
+
+Safest next step:
+- Fix backend member status enforcement first.
+- Do not start with UI changes.
+- Do not change database schema unless absolutely required.

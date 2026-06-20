@@ -1,0 +1,621 @@
+Senior QA & Software Architecture Review
+Project: Membership Management System
+Scope: Code structure only. UI and business logic were not reviewed or changed.
+
+Current Structure Summary
+-------------------------
+Overall risk level: Medium
+
+The project is organized as an npm workspace monorepo:
+
+Membership Management System/
+  apps/
+    web/              Next.js frontend
+    api/              NestJS backend
+  packages/
+    shared/           shared constants and TypeScript types
+  uploads/            runtime uploaded files
+  docker-compose.yml
+  package.json
+  README.md
+
+Frontend and backend separation is good. The frontend lives in apps/web and the backend lives in apps/api.
+The shared package lives in packages/shared and is used by both apps.
+
+Frontend Structure
+------------------
+The frontend uses Next.js App Router.
+
+Main routing areas:
+
+apps/web/app/
+  admin/              admin panel routes
+  member/             member portal routes
+  login/
+  register/
+  events/
+  notices/
+  gallery/
+  verify/
+  smritir-pata/
+  srithir-patha/
+  dashboard/
+  deashboad/
+
+Layout separation exists:
+
+apps/web/app/layout.tsx
+  Root layout. Loads public site data and wraps pages with AppShell.
+
+apps/web/app/admin/layout.tsx
+  Admin protected layout using ProtectedArea.
+
+apps/web/app/member/layout.tsx
+  Member layout using MemberLayoutContent.
+
+Reusable components are grouped under:
+
+apps/web/components/
+  admin/
+  auth/
+  member/
+  public/
+  ui/
+
+This is a reasonable structure, but some feature components and route files have become too large.
+
+Backend Structure
+-----------------
+The backend uses NestJS module-based architecture.
+
+Main modules:
+
+apps/api/src/
+  audit/
+  auth/
+  chat/
+  form-builder/
+  health/
+  mail/
+  members/
+  membership-types/
+  prisma/
+  public-content/
+  renewals/
+
+AppModule imports feature modules from apps/api/src/app.module.ts.
+
+Controllers, services, DTOs, and modules exist for most backend features.
+DTO validation uses class-validator and class-transformer.
+Prisma is configured under apps/api/prisma with schema, migrations, and seed.
+
+Problems Found
+--------------
+1. Large files are the biggest structural risk.
+
+Examples:
+
+apps/web/app/admin/website/page.tsx
+  Very large admin website page.
+
+apps/web/components/admin/blog-post-editor.tsx
+  Very large editor component.
+
+apps/api/src/public-content/public-content.service.ts
+  Very large service containing many public content, media, gallery, and website responsibilities.
+
+apps/api/src/members/members.service.ts
+  Large service with many member-related responsibilities.
+
+Risk: These files are harder to test, review, debug, and safely refactor.
+
+2. Repository layer is missing.
+
+Most services directly use PrismaService.
+
+Examples:
+
+apps/api/src/members/members.service.ts
+apps/api/src/public-content/public-content.service.ts
+apps/api/src/renewals/renewals.service.ts
+apps/api/src/auth/auth.service.ts
+
+Risk: Business logic, database access, serialization, and workflow rules are mixed in services.
+
+3. Upload handling is scattered.
+
+Upload configuration and file handling appear in multiple controllers/services:
+
+apps/api/src/main.ts
+apps/api/src/public-content/public-content.controller.ts
+apps/api/src/public-content/public-content.service.ts
+apps/api/src/form-builder/form-builder.controller.ts
+apps/api/src/form-builder/form-builder.service.ts
+apps/api/src/chat/chat.controller.ts
+apps/api/src/chat/chat.service.ts
+apps/api/src/members/members.controller.ts
+apps/api/src/members/members.service.ts
+
+Risk: File size limits, allowed MIME types, storage paths, and URL generation can become inconsistent.
+
+4. Shared TypeScript types are too centralized.
+
+packages/shared/src/types.ts contains many unrelated types:
+
+auth types
+member types
+public content types
+gallery types
+renewal types
+notification types
+form builder types
+
+Risk: The shared type file will become harder to maintain and can cause unnecessary coupling.
+
+5. Naming convention inconsistency exists.
+
+Examples:
+
+dashboard and deashboad
+smritir-pata and srithir-patha
+srithir_patha key while visible label is Smritir Pata
+
+Some may be intentional legacy redirects, but they should be documented clearly.
+
+Risk: Confusing route names can break links or make maintenance error-prone.
+
+6. Test/spec structure is missing.
+
+No clear test files were found:
+
+*.spec.ts
+*.test.ts
+*.spec.tsx
+*.test.tsx
+__tests__/
+
+No test scripts are currently defined in root, API, or web package scripts.
+
+Risk: Refactoring will be risky without regression coverage.
+
+7. Gitignore is incomplete.
+
+Current .gitignore ignores:
+
+node_modules
+.npm-cache
+.next
+dist
+coverage
+.env
+.env.local
+.env.*.local
+*.log
+Dockerfile.local
+
+Missing ignore patterns:
+
+*.pid
+*.token
+*.upload.json
+*.tsbuildinfo
+uploads/
+apps/api/uploads/
+apps/web/.next/
+
+Risk: Runtime artifacts, uploaded files, local tokens, and TypeScript build cache files may accidentally enter source control.
+
+8. README is useful but stale.
+
+README says authentication is reserved for a next implementation phase, but auth modules, guards, JWT, roles, and permissions already exist.
+
+Risk: New developers may follow outdated documentation.
+
+9. Admin/member/public structure exists but can be clearer.
+
+Current route layout separation exists, but frontend feature logic is mostly under app pages and broad components folders.
+
+Risk: app route files can become too heavy instead of being thin route wrappers.
+
+10. Auth guard and role permission structure exists but should be centralized.
+
+Current auth files:
+
+apps/api/src/auth/jwt-auth.guard.ts
+apps/api/src/auth/permission.guard.ts
+apps/api/src/auth/permissions.decorator.ts
+apps/api/src/auth/current-user.decorator.ts
+
+This works, but common guards/decorators are better placed under apps/api/src/common.
+
+Missing Folders / Files
+-----------------------
+Recommended backend folders:
+
+apps/api/src/common/
+apps/api/src/common/guards/
+apps/api/src/common/decorators/
+apps/api/src/common/interceptors/
+apps/api/src/common/upload/
+apps/api/src/config/
+
+Recommended backend repository folders:
+
+apps/api/src/auth/repositories/
+apps/api/src/members/repositories/
+apps/api/src/public-content/repositories/
+apps/api/src/renewals/repositories/
+apps/api/src/membership-types/repositories/
+
+Recommended frontend folders:
+
+apps/web/features/
+apps/web/features/admin/
+apps/web/features/member/
+apps/web/features/public/
+apps/web/types/
+apps/web/hooks/
+apps/web/services/
+
+Recommended shared type files:
+
+packages/shared/src/types/auth.ts
+packages/shared/src/types/member.ts
+packages/shared/src/types/public-content.ts
+packages/shared/src/types/renewal.ts
+packages/shared/src/types/gallery.ts
+packages/shared/src/types/form-builder.ts
+packages/shared/src/types/notifications.ts
+
+Recommended test folders:
+
+apps/api/test/
+apps/api/src/**/*.spec.ts
+apps/web/__tests__/
+apps/web/e2e/
+
+Risk Level
+----------
+Overall: Medium
+
+High-risk areas:
+
+1. Upload handling and stored file paths.
+2. Route renames such as deashboad/dashboard and srithir-patha/smritir-pata.
+3. Moving auth guards/decorators without compatibility exports.
+4. Splitting large services without tests.
+
+Medium-risk areas:
+
+1. Shared type reorganization.
+2. Repository extraction.
+3. Frontend feature folder extraction.
+
+Low-risk areas:
+
+1. Creating empty folders.
+2. Adding README documentation.
+3. Adding test scripts.
+4. Adding .gitignore patterns.
+5. Creating compatibility re-export files.
+
+Recommended Improved Structure
+------------------------------
+Recommended backend structure:
+
+apps/api/src/
+  common/
+    decorators/
+      current-user.decorator.ts
+      permissions.decorator.ts
+    guards/
+      jwt-auth.guard.ts
+      permission.guard.ts
+    upload/
+      upload.constants.ts
+      upload.service.ts
+  config/
+    env.validation.ts
+  auth/
+    dto/
+    repositories/
+      auth.repository.ts
+    auth.controller.ts
+    auth.service.ts
+    auth.module.ts
+  members/
+    dto/
+    repositories/
+      members.repository.ts
+    members.controller.ts
+    members.service.ts
+    members.module.ts
+  public-content/
+    dto/
+    repositories/
+      public-content.repository.ts
+    media.service.ts
+    gallery.service.ts
+    website-settings.service.ts
+    public-content.controller.ts
+    public-content.service.ts
+    public-content.module.ts
+  renewals/
+    dto/
+    repositories/
+      renewals.repository.ts
+    renewals.controller.ts
+    renewals.service.ts
+    renewals.module.ts
+  prisma/
+    prisma.module.ts
+    prisma.service.ts
+  main.ts
+
+Recommended frontend structure:
+
+apps/web/
+  app/
+    admin/
+    member/
+    login/
+    register/
+    events/
+    notices/
+    gallery/
+    verify/
+  components/
+    ui/
+  features/
+    admin/
+      website/
+      gallery/
+      members/
+      form-builder/
+    member/
+      chat/
+      profile/
+      payments/
+      smritir-pata/
+    public/
+      home/
+      content/
+      gallery/
+  hooks/
+  lib/
+  services/
+  types/
+
+Recommended shared package structure:
+
+packages/shared/src/
+  constants.ts
+  index.ts
+  types.ts
+  types/
+    auth.ts
+    member.ts
+    public-content.ts
+    renewal.ts
+    gallery.ts
+    form-builder.ts
+    notifications.ts
+
+Step-by-Step Refactor Plan
+--------------------------
+Step 1: Update .gitignore.
+
+Add:
+
+*.pid
+*.token
+*.upload.json
+*.tsbuildinfo
+uploads/
+apps/api/uploads/
+apps/web/.next/
+
+This is low risk and should be done first.
+
+Step 2: Update README.
+
+Fix stale Auth Direction section.
+Document current routes, auth, env setup, upload storage, and test commands.
+
+Step 3: Add test scripts and empty test folders.
+
+Add root scripts:
+
+npm run test
+npm run test:api
+npm run test:web
+
+Create:
+
+apps/api/test/
+apps/web/__tests__/
+
+Step 4: Split shared types safely.
+
+Create domain files under packages/shared/src/types/.
+Move related interfaces gradually.
+Keep packages/shared/src/types.ts as a re-export file so existing imports do not break.
+
+Step 5: Create common backend folders.
+
+Create:
+
+apps/api/src/common/guards/
+apps/api/src/common/decorators/
+apps/api/src/common/upload/
+
+Move auth guards and decorators gradually.
+Keep old auth files as re-export wrappers temporarily.
+
+Step 6: Centralize upload constants.
+
+Create:
+
+apps/api/src/common/upload/upload.constants.ts
+apps/api/src/common/upload/upload.service.ts
+
+Move file size limits, allowed MIME types, and upload root path constants there.
+Do not change public /uploads URLs yet.
+
+Step 7: Add repository layer feature-by-feature.
+
+Start with the least risky module, such as membership-types.
+Then move to auth, renewals, members, and public-content.
+
+Keep service method signatures unchanged during extraction.
+
+Step 8: Split large backend services.
+
+For public-content:
+
+public-content.service.ts
+media.service.ts
+gallery.service.ts
+website-settings.service.ts
+blog.service.ts
+
+For members:
+
+members.service.ts
+member-profile.service.ts
+member-payment.service.ts
+member-application.service.ts
+
+Step 9: Split large frontend files into feature folders.
+
+Keep route files as thin wrappers.
+
+Example:
+
+apps/web/app/admin/website/page.tsx
+  should import from:
+  apps/web/features/admin/website/website-admin-page.tsx
+
+Then split subcomponents inside:
+
+apps/web/features/admin/website/components/
+apps/web/features/admin/website/hooks/
+apps/web/features/admin/website/types.ts
+
+Step 10: Handle legacy route names carefully.
+
+Do not remove:
+
+apps/web/app/deashboad/
+apps/web/app/srithir-patha/
+
+Until redirects are confirmed and documented.
+
+Step 11: Add focused tests before deeper refactors.
+
+Recommended first tests:
+
+Auth guard behavior
+Permission guard behavior
+DTO validation
+Upload file size/type rules
+Member query pagination
+Public route serialization
+
+Exact Files That Need To Be Moved Or Created
+--------------------------------------------
+Create first:
+
+apps/api/src/common/guards/jwt-auth.guard.ts
+apps/api/src/common/guards/permission.guard.ts
+apps/api/src/common/decorators/current-user.decorator.ts
+apps/api/src/common/decorators/permissions.decorator.ts
+apps/api/src/common/upload/upload.constants.ts
+apps/api/src/common/upload/upload.service.ts
+apps/api/src/config/env.validation.ts
+
+Create repository files:
+
+apps/api/src/auth/repositories/auth.repository.ts
+apps/api/src/members/repositories/members.repository.ts
+apps/api/src/public-content/repositories/public-content.repository.ts
+apps/api/src/renewals/repositories/renewals.repository.ts
+apps/api/src/membership-types/repositories/membership-types.repository.ts
+
+Create frontend feature folders:
+
+apps/web/features/admin/website/
+apps/web/features/admin/gallery/
+apps/web/features/admin/members/
+apps/web/features/admin/form-builder/
+apps/web/features/member/chat/
+apps/web/features/member/profile/
+apps/web/features/member/payments/
+apps/web/features/member/smritir-pata/
+apps/web/features/public/home/
+apps/web/features/public/content/
+apps/web/features/public/gallery/
+
+Create shared type files:
+
+packages/shared/src/types/auth.ts
+packages/shared/src/types/member.ts
+packages/shared/src/types/public-content.ts
+packages/shared/src/types/renewal.ts
+packages/shared/src/types/gallery.ts
+packages/shared/src/types/form-builder.ts
+packages/shared/src/types/notifications.ts
+
+Move later with compatibility exports:
+
+apps/api/src/auth/jwt-auth.guard.ts
+apps/api/src/auth/permission.guard.ts
+apps/api/src/auth/current-user.decorator.ts
+apps/api/src/auth/permissions.decorator.ts
+packages/shared/src/types.ts
+
+Risky Change Warning Before Applying
+------------------------------------
+Do not immediately rename route folders like:
+
+apps/web/app/deashboad/
+apps/web/app/dashboard/
+apps/web/app/srithir-patha/
+apps/web/app/smritir-pata/
+
+Reason: Existing links, redirects, browser bookmarks, and stored CMS links may depend on these paths.
+
+Do not change upload paths or URL prefixes immediately.
+
+Reason: Existing database records likely store /uploads/... URLs.
+
+Do not move auth guards/decorators in one commit without re-export wrappers.
+
+Reason: Many controllers import these files from the current auth folder.
+
+Do not split large services before adding focused tests.
+
+Reason: public-content and members services likely contain many workflows. Refactoring without regression coverage is risky.
+
+Safest Structure Improvement Plan
+---------------------------------
+The safest plan without breaking existing functionality:
+
+1. Update .gitignore.
+2. Update README to match current project state.
+3. Add empty test structure and test scripts.
+4. Split shared types with backwards-compatible re-exports.
+5. Create apps/api/src/common and move guards/decorators with compatibility exports.
+6. Centralize upload constants without changing endpoints or stored paths.
+7. Introduce repository classes gradually, one feature at a time.
+8. Split large frontend route files into feature folders while keeping route files as wrappers.
+9. Add tests around every extracted module.
+10. Only then clean up legacy route names with redirects.
+
+Final Recommendation
+--------------------
+The current project structure is acceptable for a fast-growing internal application, but it is starting to show medium architectural risk due to large files, missing repository layer, scattered upload handling, and missing tests.
+
+Do not do a big-bang refactor.
+
+Start with low-risk structure improvements, preserve existing imports with re-export files, keep public routes unchanged, and add tests before touching the largest services.

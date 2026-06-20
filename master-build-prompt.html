@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Membership Management System - Master Build Prompt</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --paper: #ffffff;
+      --ink: #17202a;
+      --muted: #5f6b7a;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-2: #1d4ed8;
+      --code-bg: #101828;
+      --code-ink: #eef4ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, "Noto Sans Bengali", "Noto Sans", sans-serif;
+      line-height: 1.62;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 28px auto;
+    }
+
+    .document {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 14px 35px rgba(16, 24, 40, 0.08);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 32px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f3faf9 100%);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0 0 12px;
+      line-height: 1.25;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-top: 28px;
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    h3 {
+      margin-top: 22px;
+      font-size: 18px;
+      color: var(--accent-2);
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    .subtitle {
+      max-width: 860px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .content {
+      padding: 30px 32px 36px;
+    }
+
+    .note {
+      border-left: 4px solid var(--accent);
+      background: #ecfdf5;
+      padding: 14px 16px;
+      margin: 18px 0;
+      border-radius: 6px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 18px 24px;
+      padding: 0;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    code {
+      background: #eef2f7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.95em;
+    }
+
+    pre {
+      margin: 18px 0;
+      padding: 20px;
+      overflow: auto;
+      background: var(--code-bg);
+      color: var(--code-ink);
+      border-radius: 8px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .prompt-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 18px;
+    }
+
+    .prompt-title {
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #ffffff;
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      main {
+        width: 100%;
+        margin: 0;
+      }
+
+      .document {
+        box-shadow: none;
+        border: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <article class="document">
+      <header>
+        <h1>Membership Management System - Master Build Prompt</h1>
+        <p class="subtitle">
+          এই prompt টি অন্য AI agent, developer, বা software team-কে দিলে তারা যেন সময় নষ্ট না করে সরাসরি full functional production-grade Membership Management System তৈরি করতে পারে।
+        </p>
+      </header>
+
+      <section class="content">
+        <div class="note">
+          <strong>Important:</strong> এই system SaaS নয়। এটি single organization-এর জন্য full Association / Alumni / Community / Club Management System হবে। কোনো demo, mock, placeholder-only, fake workflow বা half-functional implementation করা যাবে না।
+        </div>
+
+        <h2>Copy-Ready Prompt</h2>
+        <p>নিচের prompt অংশটি সরাসরি copy করে ব্যবহার করা যাবে।</p>
+
+        <div class="prompt-box">
+          <div class="prompt-title">MASTER PROMPT</div>
+          <pre>
+You are a senior full-stack software engineer and product architect. Build a complete production-grade Membership Management System for a single organization such as an association, alumni group, community, club, chamber, or professional body.
+
+This is NOT a SaaS product. Do not build multi-tenant subscription, multiple organization billing, package management, subdomain management, or SaaS admin features. The system is for one organization only, but it must be configurable enough for different association-style requirements.
+
+The system must be fully functional. Do not create a demo-only system. Do not use fake data as the core implementation. Do not leave important workflows as placeholders. Every module you implement must have working backend, database persistence, validation, authentication/authorization, frontend UI, and practical error handling.
+
+Use this technology stack unless the project owner explicitly changes it:
+
+- Frontend: Next.js with TypeScript
+- Backend: NestJS with TypeScript
+- Database: PostgreSQL
+- ORM: Prisma
+- UI: Tailwind CSS with shadcn/ui-style components
+- Auth: JWT access token plus refresh token
+- File upload: local storage first, designed so S3-compatible storage can be added later
+- PDF/ID generation: server-side HTML-to-PDF or image/PDF generation
+- QR code: server-generated QR linked to public verification page
+- Deployment: Docker Compose on VPS with Nginx/reverse proxy support
+
+Recommended monorepo structure:
+
+membership-management-system/
+  apps/
+    web/                 # Next.js frontend: public website, member panel, admin panel
+    api/                 # NestJS backend API
+  packages/
+    shared/              # shared types, constants, validation helpers
+  docker-compose.yml
+  README.md
+
+Core requirement:
+Build a complete Membership Management System with public website, admin panel, member dashboard, dynamic form builder, registration approval workflow, membership type and renewal rules, committee management, notice/event modules, payment/chanda/donation tracking, ID card with QR verification, gallery, reports, role permission, audit logs, and future-ready structure for election and accounts modules.
+
+General engineering rules:
+
+1. Use TypeScript everywhere.
+2. Use PostgreSQL relational schema with Prisma migrations.
+3. Use clean module-based architecture in NestJS.
+4. Use DTO validation, guards, policies/permissions, and consistent API responses.
+5. Use pagination, filtering, sorting, and search for admin lists.
+6. Use real authentication and authorization.
+7. Use secure password hashing.
+8. Use audit logging for important admin actions.
+9. Use file validation for uploaded images/documents.
+10. Use environment variables for secrets.
+11. Include seed data only for initial roles, permissions, settings, and optional development testing, not as a substitute for real features.
+12. Include README setup instructions.
+13. Include Docker Compose for local and server deployment.
+14. Build responsive UI for desktop and mobile.
+15. Never hardcode organization-specific registration fields; use the dynamic form builder.
+
+Main user roles:
+
+- Public Visitor
+- Member
+- Super Admin
+- Admin
+- Accountant
+- Committee Manager
+- Content Manager
+- Election Officer
+
+Role permission must be configurable from admin panel, at least at module/action level.
+
+Public Website:
+
+Build public pages:
+
+- Home
+- About
+- Member Directory
+- Current Committees
+- Previous Committees
+- Notices
+- Notice Details
+- Events
+- Event Details
+- Gallery
+- Donation
+- Election Results
+- Member Verification by QR
+- Registration
+- Login
+
+Public website features:
+
+- Homepage slider/banner
+- President or organization message
+- Sponsor/banner section
+- Current committee preview
+- Notice/event preview
+- Public member directory with search/filter
+- Hide expired/non-renewed members if configured
+- Show only public-safe member fields
+- Current and previous committee archive
+- Public notice/event visibility control
+- Public QR verification page showing safe information only: member name, member ID, status, membership type, validity/expiry, photo if allowed
+
+Admin Panel:
+
+Build admin pages:
+
+- Dashboard
+- Members
+- Pending Applications
+- Member Details
+- Form Builder
+- Membership Types
+- Renewal Settings
+- Committees
+- Committee Types
+- Committee Terms
+- Committee Positions
+- Notices
+- Events
+- Payments
+- Chanda
+- Donations
+- Basic Accounts
+- Gallery
+- ID Cards
+- Reports
+- Users
+- Roles and Permissions
+- Settings
+- Audit Logs
+
+Admin member workflow:
+
+- Public visitor submits registration form
+- Application status starts as pending
+- Admin can mark under_review
+- Admin can approve
+- Admin can reject with reason
+- Admin can request correction with message
+- Correction-requested applicant/member can update requested fields/documents
+- On approval, generate member ID and allow member login
+- Admin can suspend, inactive, expired, or reactivate member
+- Keep full application history and audit logs
+
+Member Panel:
+
+Build member pages:
+
+- Dashboard
+- Profile
+- Registration Details
+- Renewal Status
+- Chanda Status
+- Payment History
+- Donation History
+- Event Registrations
+- Notices
+- Committee History
+- ID Card
+- Certificates
+
+Member features:
+
+- Member can login securely
+- Member can view profile and submitted registration details
+- Member can request profile update if direct edit is restricted
+- Member can see renewal status
+- Member can see monthly chanda/due status
+- Member can see payment, donation, and event history
+- Member can download or view ID card
+- Member can view member-only notices
+- Member can see committee history
+
+Dynamic Form Builder:
+
+This is one of the most important modules. Registration forms must not be hardcoded.
+
+Admin must be able to create and manage:
+
+- Form sections/groups
+- Fields inside sections
+- Field order/sort
+- Field label
+- Field key/name
+- Placeholder/help text
+- Required/optional
+- Public/private visibility
+- Member editable yes/no
+- Admin only yes/no
+- Membership type specific yes/no
+- Validation rules
+- Options for dropdown/radio/checkbox
+- File upload settings
+- Document upload settings
+
+Supported field types:
+
+- text
+- textarea
+- number
+- date
+- email
+- phone
+- dropdown
+- radio
+- checkbox
+- file
+- image
+- document
+
+Registration form submission:
+
+- Render dynamic fields on public registration page
+- Validate required fields and type-specific rules
+- Store core member data in relational columns
+- Store custom field values in a queryable structure
+- Store uploaded files/documents safely
+- Preserve form field label/key snapshot if needed for future history
+
+Membership Type and Renewal:
+
+Admin can create membership types:
+
+- General Member
+- Lifetime Member
+- Honorary Member
+- Donor Member
+- Corporate Member
+- Custom Type
+
+Each membership type must support:
+
+- Renewal required: yes/no
+- Renewal fee
+- Renewal cycle: monthly/yearly/custom
+- Grace period
+- Directory visibility when expired
+- Monthly chanda required: yes/no
+- Monthly chanda amount
+- Active/inactive status
+
+Rules:
+
+- If renewal is required and member does not renew, member can be hidden from public member directory based on settings.
+- Expired member record must remain in admin panel.
+- Lifetime/honorary/non-renewal members remain visible if active.
+
+Committee Management:
+
+Build committee system with:
+
+- Committee type: central, executive, advisory, election, district, country chapter, city, branch, custom
+- Committee term, such as 2020-2022, 2022-2024, 2026-2028
+- Committee positions, such as President, Secretary, Treasurer, Executive Member
+- Assign members to committee term positions
+- One member can serve multiple terms and different positions
+- Current running committee
+- Previous committee archive
+- Member committee history
+- Public committee pages
+
+Important rule:
+When a committee term ends, archive it. Never delete historical committee records.
+
+Notice Module:
+
+Admin can publish notices with:
+
+- Title
+- Slug
+- Description/content
+- Attachment
+- Category/type: AGM, renewal notice, election notice, urgent notice, general notice, custom
+- Visibility: public, members only, committee wise, district wise, country wise, membership type wise, specific member group
+- Publish status: draft, published, archived
+- Publish date
+
+Event Module:
+
+Admin can create events:
+
+- AGM
+- Reunion
+- Seminar
+- Meeting
+- Election
+- Custom event
+
+Event features:
+
+- Public/member-only visibility
+- Registration open/close date
+- Event fee
+- Guest count
+- Member registration
+- Manual payment record
+- QR ticket
+- Attendance check-in basic
+- Event registration report
+
+Finance Basic:
+
+Build practical basic finance tracking first. Full accounting can be advanced phase, but the first version must still persist payment and collection data properly.
+
+Payment categories:
+
+- Membership fee
+- Renewal fee
+- Monthly chanda
+- Donation
+- Event fee
+- Sponsorship
+- Other income
+- Expense
+
+Payment fields:
+
+- Member or non-member payer
+- Amount
+- Payment method: cash, bank, bKash, Nagad, Rocket, other
+- Account/cash/bank reference
+- Transaction ID/reference number
+- Payment date
+- Status: pending, approved, rejected, refunded
+- Receipt number
+- Notes
+
+Donation:
+
+- Member donation
+- Non-member donation
+- Company donation
+- Donation receipt
+- Donation history
+
+Accounts:
+
+- Cash account
+- Bank account
+- Mobile banking account
+- Petty cash account
+- Basic income/expense entry
+- Basic cash/bank balance
+- Basic reports
+
+ID Card and QR Verification:
+
+Build ID card generator:
+
+- Member photo
+- Member name
+- Member ID
+- Membership type
+- Status
+- Expiry date if applicable
+- Committee position optional
+- QR code
+
+QR scan opens public verification page and shows only safe information.
+
+Gallery and Content:
+
+Admin can manage:
+
+- Homepage slider/banner
+- President message
+- Sponsor banner
+- Gallery albums
+- Gallery photos/videos/links
+- Basic content settings
+
+Reports:
+
+Build export/report features:
+
+- Member list
+- Pending application list
+- Approved member list
+- Expired member list
+- Renewal due report
+- Chanda due report
+- Payment collection report
+- Donation report
+- Event registration report
+- Committee member report
+- Excel export
+- PDF export where practical
+
+Audit Log:
+
+Track important admin actions:
+
+- Member approval/rejection/correction
+- Member status change
+- Payment approval/rejection
+- Membership type change
+- Form field change
+- Committee assignment change
+- Notice/event publish
+- Role/permission change
+
+Initial database tables to design:
+
+- users
+- roles
+- permissions
+- role_permissions
+- user_roles
+- members
+- membership_types
+- form_sections
+- form_fields
+- member_form_values
+- member_documents
+- member_status_logs
+- committees
+- committee_types
+- committee_terms
+- committee_positions
+- committee_members
+- notices
+- events
+- event_registrations
+- payments
+- donations
+- accounts
+- account_transactions
+- id_cards
+- certificates
+- gallery_albums
+- gallery_items
+- settings
+- audit_logs
+- elections
+- election_positions
+- election_candidates
+- election_panels
+- election_voters
+- election_votes
+
+Election/Voting Advanced Module:
+
+Design the database and architecture so election can be added cleanly. If implementing election in this build, include:
+
+- Election create
+- Position create
+- Candidate nomination
+- Panel/group support
+- Independent candidate support
+- Eligibility rule
+- Voter list
+- One member one vote
+- Secret vote storage
+- Admin can see who voted
+- Admin cannot see who voted for whom
+- Position-wise result
+- Panel-wise result
+- Election archive
+
+Security:
+
+- Use HTTPS-ready deployment config
+- Hash passwords
+- Protect refresh tokens
+- Validate all DTOs
+- Sanitize file uploads
+- Restrict private documents
+- Use authorization guards
+- Prevent unauthorized access to member-only data
+- Avoid exposing private form fields publicly
+- Keep voting secret if election is implemented
+
+Development phases:
+
+Phase 0: Setup
+- Monorepo
+- Next.js
+- NestJS
+- PostgreSQL
+- Prisma
+- Docker Compose
+- Environment variables
+- Lint/format setup
+
+Phase 1: Auth and Roles
+- User model
+- Member model basic
+- Admin/member login
+- JWT and refresh token
+- Roles and permissions
+- Guards
+- Audit log base
+
+Phase 2: Dynamic Form Builder
+- Form sections
+- Form fields
+- Field settings
+- Dynamic form rendering
+- Dynamic validation
+- File/document upload
+
+Phase 3: Registration Workflow
+- Public registration
+- Pending application
+- Admin review
+- Approve/reject/correction
+- Member ID generation
+- Member login after approval
+
+Phase 4: Membership and Renewal
+- Membership types
+- Renewal rules
+- Chanda rules
+- Expiry and directory visibility
+
+Phase 5: Public Website
+- Home/about
+- Member directory
+- Current/previous committee
+- Notices/events
+- Gallery
+- QR verification
+
+Phase 6: Member Dashboard
+- Profile
+- Registration data
+- Renewal/chanda/payment history
+- Notices/events
+- ID card
+
+Phase 7: Committee
+- Committee types
+- Terms
+- Positions
+- Assign members
+- Public archive
+- Member history
+
+Phase 8: Notice and Event
+- Notice visibility
+- Event registration
+- Payment tracking
+- QR ticket
+- Check-in basic
+
+Phase 9: Finance Basic
+- Payment categories
+- Donations
+- Accounts
+- Receipt
+- Reports
+
+Phase 10: ID Card and Reports
+- ID card with QR
+- PDF/image download
+- Excel/PDF reports
+
+Phase 11: Advanced Modules
+- Election/voting
+- Advanced accounts
+- Certificates
+- SMS/email
+- Payment gateway
+
+Minimum MVP must include:
+
+- Auth
+- Admin/member role separation
+- Dynamic form builder
+- Public registration
+- Admin approval/rejection/correction
+- Member dashboard
+- Membership type and renewal basic
+- Public website
+- Member directory
+- Committee management
+- Notice module
+- Basic event module
+- Basic payment/chanda/donation tracking
+- ID card with QR verification
+- Gallery basic
+- Reports basic
+
+Do not stop at UI only. For every feature, implement:
+
+- Database schema
+- Backend module/API
+- Validation
+- Permission checks
+- Frontend UI
+- Empty/loading/error states
+- Audit logging where applicable
+- Basic tests or at least testable service structure
+
+Before finishing any phase:
+
+- Run database migration
+- Run lint/typecheck/build
+- Verify core flows manually
+- Update README if setup or commands change
+- Do not claim completion unless the workflow actually works end to end
+          </pre>
+        </div>
+
+        <h2>Implementation Checklist</h2>
+        <div class="checklist">
+          <div class="card">
+            <strong>Stack</strong>
+            Next.js, NestJS, PostgreSQL, Prisma, Tailwind CSS, Docker.
+          </div>
+          <div class="card">
+            <strong>System Type</strong>
+            Single organization. SaaS বা multi-tenant নয়।
+          </div>
+          <div class="card">
+            <strong>Quality Rule</strong>
+            Demo নয়। Full backend, frontend, database, auth, validation সহ কাজ করতে হবে।
+          </div>
+          <div class="card">
+            <strong>Most Important</strong>
+            Dynamic Form Builder, registration approval, renewal visibility, committee archive।
+          </div>
+        </div>
+
+        <h2>Recommended First Build Steps</h2>
+        <ol>
+          <li>Monorepo, Docker, Next.js, NestJS, Prisma, PostgreSQL setup করুন।</li>
+          <li>Auth, user, role, permission এবং audit log base তৈরি করুন।</li>
+          <li>Member, membership type, form section, form field schema তৈরি করুন।</li>
+          <li>Dynamic registration form builder এবং public registration flow বানান।</li>
+          <li>Admin approval/rejection/correction workflow বানান।</li>
+          <li>Member dashboard, public website, member directory এবং QR verification যোগ করুন।</li>
+          <li>Committee, notice, event, payment, donation এবং ID card module যোগ করুন।</li>
+          <li>Reports, gallery, settings, advanced account/election phase-wise সম্পন্ন করুন।</li>
+        </ol>
+
+        <h2>Notes For Developer</h2>
+        <ul>
+          <li>Registration fields hardcode করা যাবে না। শুধু core identity fields relational table-এ থাকবে, বাকিগুলো form builder-driven হবে।</li>
+          <li>Expired/non-renewed member public directory থেকে hide হতে পারে, কিন্তু admin panel থেকে কখনো হারাবে না।</li>
+          <li>Committee term শেষ হলে delete নয়, archive করতে হবে।</li>
+          <li>Member ID, receipt number, QR token এগুলো predictable বা insecure করা যাবে না।</li>
+          <li>Admin যেন sensitive private form fields public website-এ accidentally expose করতে না পারে।</li>
+          <li>Election module করলে voting secrecy খুব কঠোরভাবে maintain করতে হবে।</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+</body>
+</html>

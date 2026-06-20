@@ -1,0 +1,722 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MemberStatus {
+  pending
+  under_review
+  correction_requested
+  approved
+  rejected
+  active
+  inactive
+  suspended
+  expired
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+enum PaymentPurpose {
+  renewal
+  chanda
+  donation
+  registration_fee
+  other
+}
+
+enum FormFieldType {
+  text
+  textarea
+  number
+  date
+  email
+  phone
+  dropdown
+  radio
+  checkbox
+  file
+  image
+  document
+}
+
+enum WebsitePageStatus {
+  draft
+  published
+  hidden
+}
+
+enum WebsitePageLayout {
+  standard
+  landing
+  sidebar
+  custom
+}
+
+enum ChatConversationType {
+  direct
+  group
+}
+
+enum MediaType {
+  image
+  video
+  document
+}
+
+model OrganizationSettings {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WebsiteSectionSetting {
+  id         String   @id @default(uuid())
+  key        String   @unique
+  label      String
+  href       String
+  active     Boolean  @default(true)
+  navVisible Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([active, navVisible, sortOrder])
+  @@map("website_section_settings")
+}
+
+model WebsiteGeneralSetting {
+  id              String   @id @default(uuid())
+  siteTitle       String
+  logoUrl         String?
+  faviconUrl      String?
+  metaKeywords    String?
+  metaDescription String?
+  idCardSignatures Json     @default("[]")
+  idCardFields     Json     @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("website_general_settings")
+}
+
+model WebsitePageSetting {
+  id              String            @id @default(uuid())
+  key             String            @unique
+  title           String
+  route           String
+  status          WebsitePageStatus @default(published)
+  layout          WebsitePageLayout @default(standard)
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  heroTitle       String?
+  heroSubtitle    String?
+  body            String?
+  customTemplate  String?
+  contentBlocks   Json              @default("[]")
+  sortOrder       Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([status, sortOrder])
+  @@map("website_page_settings")
+}
+
+model GalleryAlbum {
+  id          String         @id @default(uuid())
+  title       String
+  slug        String         @unique
+  description String?
+  coverUrl    String?
+  published   Boolean        @default(true)
+  sortOrder   Int            @default(0)
+  photos      GalleryPhoto[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([published, sortOrder])
+  @@map("gallery_albums")
+}
+
+model GalleryPhoto {
+  id               String       @id @default(uuid())
+  albumId          String
+  title            String
+  caption          String?
+  imageUrl         String
+  thumbnailUrl     String
+  originalFileName String
+  mimeType         String
+  fileSize         Int
+  width            Int
+  height           Int
+  published        Boolean      @default(true)
+  sortOrder        Int          @default(0)
+  album            GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([albumId, published, sortOrder])
+  @@map("gallery_photos")
+}
+
+model AlumniVoice {
+  id          String   @id @default(uuid())
+  name        String
+  role        String
+  affiliation String?
+  quote       String
+  initials    String?
+  imageUrl    String?
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, sortOrder])
+  @@map("alumni_voices")
+}
+
+model HomeHeroSlide {
+  id              String   @id @default(uuid())
+  eyebrow         String
+  eyebrowIcon     String   @default("fa6-solid:graduation-cap")
+  eyebrowVisible  Boolean  @default(true)
+  title           String
+  body            String
+  imageUrl        String
+  imagePosition   String   @default("center center")
+  primaryLabel    String?
+  primaryHref     String?
+  secondaryLabel  String?
+  secondaryHref   String?
+  tertiaryLabel   String?
+  tertiaryHref    String?
+  accentClass     String   @default("bg-[hsl(var(--cream))]")
+  published       Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([published, sortOrder])
+  @@map("home_hero_slides")
+}
+
+model MediaAsset {
+  id            String    @id @default(uuid())
+  fileName      String
+  originalName  String
+  filePath      String
+  fileUrl       String
+  mimeType      String
+  mediaType     MediaType
+  fileSize      Int
+  width         Int?
+  height        Int?
+  altText       String?
+  title         String
+  caption       String?
+  description   String?
+  thumbnailPath String?
+  thumbnailUrl  String?
+  mediumUrl     String?
+  largeUrl      String?
+  optimizedPath String?
+  originalPath  String?
+  originalUrl   String?
+  uploadedBy    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([mediaType, createdAt])
+  @@index([originalName])
+  @@map("media_assets")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  fullName     String
+  passwordHash String
+  mustChangePassword Boolean @default(false)
+  isActive     Boolean  @default(true)
+  lastLoginAt  DateTime?
+  member       Member?
+  roles        UserRoleAssignment[]
+  refreshTokenSessions RefreshTokenSession[]
+  auditLogs    AuditLog[]
+  blogPostComments BlogPostComment[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  isSystem    Boolean  @default(true)
+  users       UserRoleAssignment[]
+  permissions RolePermission[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  module      String
+  action      String
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([module, action])
+  @@map("permissions")
+}
+
+model UserRoleAssignment {
+  userId    String
+  roleId    String
+  assignedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  assignedAt   DateTime @default(now())
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model RefreshTokenSession {
+  id                String    @id @default(uuid())
+  userId            String
+  tokenHash         String    @unique
+  userAgent         String?
+  ipAddress         String?
+  expiresAt         DateTime
+  revokedAt         DateTime?
+  replacedByTokenId String?
+  createdAt         DateTime  @default(now())
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_token_sessions")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  module    String
+  entityType String?
+  entityId   String?
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([module, action])
+  @@map("audit_logs")
+}
+
+model Member {
+  id                    String            @id @default(uuid())
+  userId                String?           @unique
+  memberId              String?           @unique
+  correctionToken       String?           @unique
+  fullName              String
+  email                 String            @unique
+  phone                 String?
+  photo                 String?
+  status                MemberStatus      @default(pending)
+  membershipTypeId      String?
+  approvalNote          String?
+  rejectionReason       String?
+  correctionRequestedAt DateTime?
+  correctionNote        String?
+  approvedByUserId      String?
+  rejectedByUserId      String?
+  correctionByUserId    String?
+  joinedAt              DateTime?
+  approvedAt            DateTime?
+  expiredAt             DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  user                  User?             @relation(fields: [userId], references: [id])
+  membershipType        MembershipType?   @relation(fields: [membershipTypeId], references: [id])
+  statusLogs            MemberStatusLog[]
+  documents             MemberDocument[]
+  formValues            MemberFormValue[]
+  correctionRequests    MemberCorrectionRequest[]
+  correctionSubmissions MemberCorrectionSubmission[]
+  memberships           Membership[]
+  payments              Payment[]
+  notificationPreference MemberNotificationPreference?
+  chatParticipants      ChatParticipant[]
+  sentChatMessages      ChatMessage[]
+  chatPresence          MemberChatPresence?
+  blogPostComments      BlogPostComment[]
+
+  @@index([status])
+  @@index([membershipTypeId])
+  @@map("members")
+}
+
+model BlogPostComment {
+  id          String   @id @default(uuid())
+  postId      String
+  postSlug    String
+  body        String
+  authorName  String
+  authorEmail String
+  authorRole  String
+  userId      String
+  memberId    String?
+  parentId    String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  member      Member?  @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  parent      BlogPostComment? @relation("BlogPostCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     BlogPostComment[] @relation("BlogPostCommentReplies")
+
+  @@index([postSlug, published, createdAt])
+  @@index([postId, published, createdAt])
+  @@index([parentId])
+  @@index([userId])
+  @@index([memberId])
+  @@map("blog_post_comments")
+}
+
+model MemberChatPresence {
+  id            String   @id @default(uuid())
+  memberId      String   @unique
+  appearOffline Boolean  @default(false)
+  lastSeenAt    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  member        Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([appearOffline, lastSeenAt])
+  @@map("member_chat_presence")
+}
+
+model ChatConversation {
+  id                 String               @id @default(uuid())
+  type               ChatConversationType
+  nameCiphertext     String?
+  nameIv             String?
+  nameAuthTag        String?
+  encryptionKeyVersion Int                @default(1)
+  createdByMemberId  String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  participants       ChatParticipant[]
+  messages           ChatMessage[]
+
+  @@index([type, updatedAt])
+  @@map("chat_conversations")
+}
+
+model ChatParticipant {
+  id             String           @id @default(uuid())
+  conversationId String
+  memberId       String
+  role           String           @default("member")
+  joinedAt       DateTime         @default(now())
+  lastReadAt     DateTime?
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  member         Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, memberId])
+  @@index([memberId])
+  @@map("chat_participants")
+}
+
+model ChatMessage {
+  id                   String           @id @default(uuid())
+  conversationId       String
+  senderMemberId       String
+  bodyCiphertext       String?
+  bodyIv               String?
+  bodyAuthTag          String?
+  encryptionKeyVersion Int              @default(1)
+  createdAt            DateTime         @default(now())
+  conversation         ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender               Member           @relation(fields: [senderMemberId], references: [id], onDelete: Cascade)
+  attachment           ChatAttachment?
+
+  @@index([conversationId, createdAt])
+  @@index([senderMemberId])
+  @@map("chat_messages")
+}
+
+model ChatAttachment {
+  id                     String      @id @default(uuid())
+  messageId              String      @unique
+  storedFileName         String
+  originalNameCiphertext String
+  originalNameIv         String
+  originalNameAuthTag    String
+  mimeTypeCiphertext     String
+  mimeTypeIv             String
+  mimeTypeAuthTag        String
+  fileSize               Int
+  fileIv                 String
+  fileAuthTag            String
+  encryptionKeyVersion   Int         @default(1)
+  createdAt              DateTime    @default(now())
+  message                ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@map("chat_attachments")
+}
+
+model MemberNotificationPreference {
+  id             String   @id @default(uuid())
+  memberId       String   @unique
+  noticeEnabled  Boolean  @default(true)
+  eventEnabled   Boolean  @default(true)
+  postEnabled    Boolean  @default(true)
+  galleryEnabled Boolean  @default(true)
+  websiteEnabled Boolean  @default(true)
+  lastSeenAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  member         Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@map("member_notification_preferences")
+}
+
+model MemberIdSequence {
+  scope     String   @id
+  nextValue Int      @default(1)
+  updatedAt DateTime @updatedAt
+
+  @@map("member_id_sequences")
+}
+
+model Form {
+  id          String        @id @default(uuid())
+  name        String
+  code        String        @unique
+  description String?
+  active      Boolean       @default(true)
+  system      Boolean       @default(false)
+  sections    FormSection[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([active, code])
+  @@map("forms")
+}
+
+model FormSection {
+  id          String      @id @default(uuid())
+  formId      String
+  title       String
+  description String?
+  sortOrder   Int         @default(0)
+  active      Boolean     @default(true)
+  form        Form        @relation(fields: [formId], references: [id], onDelete: Cascade)
+  fields      FormField[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([formId, sortOrder])
+  @@index([active, sortOrder])
+  @@map("form_sections")
+}
+
+model FormField {
+  id                         String            @id @default(uuid())
+  sectionId                  String
+  label                      String
+  key                        String            @unique
+  placeholder                String?
+  helpText                   String?
+  type                       FormFieldType
+  required                   Boolean           @default(false)
+  publicVisible              Boolean           @default(true)
+  memberEditable             Boolean           @default(false)
+  adminOnly                  Boolean           @default(false)
+  membershipTypeSpecific     Boolean           @default(false)
+  membershipTypeIds          Json?
+  validationRules            Json?
+  options                    Json?
+  sortOrder                  Int               @default(0)
+  active                     Boolean           @default(true)
+  section                    FormSection       @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  values                     MemberFormValue[]
+  createdAt                  DateTime          @default(now())
+  updatedAt                  DateTime          @updatedAt
+
+  @@index([sectionId, sortOrder])
+  @@index([active, publicVisible])
+  @@map("form_fields")
+}
+
+model MemberFormValue {
+  id                 String        @id @default(uuid())
+  memberId           String
+  fieldId            String
+  fieldKeySnapshot   String
+  fieldLabelSnapshot String
+  fieldTypeSnapshot  FormFieldType
+  value              Json?
+  fileUrl            String?
+  fileName           String?
+  mimeType           String?
+  fileSize           Int?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  member             Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  field              FormField     @relation(fields: [fieldId], references: [id], onDelete: Restrict)
+
+  @@unique([memberId, fieldId])
+  @@index([fieldKeySnapshot])
+  @@map("member_form_values")
+}
+
+model MembershipType {
+  id                          String       @id @default(uuid())
+  name                        String
+  code                        String       @unique
+  description                 String?
+  renewalRequired             Boolean      @default(false)
+  renewalFee                  Decimal      @default(0) @db.Decimal(12, 2)
+  renewalCycle                String?
+  gracePeriodDays             Int          @default(0)
+  directoryVisibleWhenExpired Boolean      @default(false)
+  monthlyChandaRequired       Boolean      @default(false)
+  monthlyChandaAmount         Decimal      @default(0) @db.Decimal(12, 2)
+  active                      Boolean      @default(true)
+  createdAt                   DateTime     @default(now())
+  updatedAt                   DateTime     @updatedAt
+  members                     Member[]
+  memberships                 Membership[]
+
+  @@map("membership_types")
+}
+
+model MemberStatusLog {
+  id              String        @id @default(uuid())
+  memberId        String
+  fromStatus      MemberStatus?
+  toStatus        MemberStatus
+  note            String?
+  changedByUserId String?
+  createdAt       DateTime      @default(now())
+  member          Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@map("member_status_logs")
+}
+
+model MemberDocument {
+  id               String   @id @default(uuid())
+  memberId         String
+  documentType     String
+  fileName         String
+  fileUrl          String
+  mimeType         String?
+  fileSize         Int?
+  uploadedByUserId String?
+  createdAt        DateTime @default(now())
+  member           Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@map("member_documents")
+}
+
+model MemberCorrectionRequest {
+  id              String   @id @default(uuid())
+  memberId        String
+  message         String
+  fieldKeys       Json?
+  documentTypes   Json?
+  requestedByUserId String?
+  resolvedAt      DateTime?
+  createdAt       DateTime @default(now())
+  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@map("member_correction_requests")
+}
+
+model MemberCorrectionSubmission {
+  id          String   @id @default(uuid())
+  memberId    String
+  requestId   String?
+  message     String?
+  values      Json?
+  documents   Json?
+  createdAt   DateTime @default(now())
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@map("member_correction_submissions")
+}
+
+model Membership {
+  id        String         @id @default(uuid())
+  memberId  String
+  membershipTypeId String
+  startsAt  DateTime
+  endsAt    DateTime
+  status    MemberStatus   @default(active)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  member    Member         @relation(fields: [memberId], references: [id])
+  membershipType MembershipType @relation(fields: [membershipTypeId], references: [id])
+  payments  Payment[]
+}
+
+model Payment {
+  id           String        @id @default(uuid())
+  memberId     String
+  membershipId String?
+  amountCents  Int
+  purpose      PaymentPurpose @default(other)
+  status       PaymentStatus @default(pending)
+  note         String?
+  proofUrl     String?
+  proofFileName String?
+  proofMimeType String?
+  proofFileSize Int?
+  paidAt       DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  member       Member        @relation(fields: [memberId], references: [id])
+  membership   Membership?   @relation(fields: [membershipId], references: [id])
+}

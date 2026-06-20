@@ -1,0 +1,33 @@
+{
+  "name": "membership-management-system",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Single-organization membership management system monorepo.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build -w packages/shared && npm run build -w apps/api && npm run build -w apps/web",
+    "lint": "npm run lint -w packages/shared && npm run lint -w apps/api && npm run lint -w apps/web",
+    "typecheck": "npm run typecheck -w packages/shared && npm run build -w packages/shared && npm run typecheck -w apps/api && npm run typecheck -w apps/web",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css,yml,yaml}\"",
+    "prisma:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --schema apps/api/prisma/schema.prisma",
+    "prisma:deploy": "prisma migrate deploy --schema apps/api/prisma/schema.prisma",
+    "prisma:seed": "node apps/api/prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "prisma": "^5.22.0",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=20.11.0",
+    "npm": ">=10.0.0"
+  }
+}

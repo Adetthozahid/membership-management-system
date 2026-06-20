@@ -1,0 +1,345 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 42 36% 97%;
+  --foreground: 184 42% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 184 42% 12%;
+  --muted: 168 20% 92%;
+  --muted-foreground: 184 14% 34%;
+  --primary: 178 58% 20%;
+  --primary-foreground: 0 0% 100%;
+  --border: 196 18% 82%;
+  --input: 196 18% 82%;
+  --ring: 15 52% 52%;
+  --terracotta: 15 52% 52%;
+  --terracotta-foreground: 38 56% 96%;
+  --cream: 39 68% 95%;
+  --deep-teal: 178 58% 20%;
+  --sage: 156 29% 88%;
+  --sky: 202 52% 92%;
+  --sunlit: 43 84% 92%;
+  --font-sans: var(--font-manrope), var(--font-bengali), "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Merriweather", "Noto Serif Bengali", Georgia, serif;
+  --radius-card: 0.5rem;
+  --radius-control: 0.5rem;
+  --shadow-card: 0 14px 34px rgba(23, 66, 64, 0.08);
+  --shadow-card-hover: 0 20px 46px rgba(23, 66, 64, 0.13);
+  --shadow-control: 0 8px 18px hsl(var(--primary) / 0.14);
+  --icon-sm: 1rem;
+  --icon-md: 1.25rem;
+  --icon-lg: 1.5rem;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background: linear-gradient(
+    180deg,
+    hsl(var(--card)) 0%,
+    hsl(var(--background)) 42%,
+    hsl(var(--sky)) 100%
+  );
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+  font-feature-settings: "kern";
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+.font-serif {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+
+::selection {
+  background: hsl(var(--terracotta) / 0.22);
+  color: hsl(var(--foreground));
+}
+
+main,
+section,
+article,
+aside,
+header,
+footer,
+nav,
+form,
+fieldset,
+label,
+div {
+  min-width: 0;
+}
+
+img,
+picture,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+img,
+video,
+canvas {
+  height: auto;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input,
+select,
+textarea {
+  border-radius: var(--radius-control);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+
+table {
+  width: 100%;
+}
+
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table > table {
+  min-width: 720px;
+}
+
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .mobile-stack {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mobile-full > *,
+  .mobile-full {
+    width: 100%;
+  }
+}
+
+.public-nav {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.public-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.site-card {
+  border-radius: var(--radius-card);
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  box-shadow: var(--shadow-card);
+}
+
+.site-card-hover {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.site-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.site-eyebrow {
+  color: hsl(var(--terracotta));
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.site-heading {
+  color: hsl(var(--primary));
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.site-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+}
+
+.member-dashboard-theme {
+  --background: 0 0% 100%;
+  --foreground: 28 14% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 28 14% 13%;
+  --muted: 32 56% 95%;
+  --muted-foreground: 27 11% 49%;
+  --primary: 16 87% 55%;
+  --primary-foreground: 0 0% 100%;
+  --border: 31 36% 89%;
+  --input: 31 36% 89%;
+  --ring: 16 87% 55%;
+  --shadow-card: 0 18px 48px rgba(84, 54, 31, 0.08);
+  --shadow-control: 0 8px 18px rgba(240, 90, 40, 0.16);
+}
+
+.member-dashboard-theme main {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(240, 90, 40, 0.055), transparent 28rem),
+    linear-gradient(180deg, #fffaf4 0%, #ffffff 34%);
+}
+
+.member-dashboard-theme input,
+.member-dashboard-theme select,
+.member-dashboard-theme textarea {
+  border-color: #eadfd4;
+  background-color: #fffdfb;
+  color: #25201c;
+  box-shadow: 0 1px 0 rgba(84, 54, 31, 0.03);
+}
+
+.member-dashboard-theme input:focus,
+.member-dashboard-theme select:focus,
+.member-dashboard-theme textarea:focus {
+  border-color: #f3a57b;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(240, 90, 40, 0.13);
+}
+
+.member-dashboard-theme table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.member-dashboard-theme thead {
+  background: #fff4e9;
+  color: #8a5a3c;
+}
+
+.member-dashboard-theme tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.member-dashboard-theme tbody tr:hover {
+  background: #fffaf4;
+}
+
+.member-dashboard-theme h1 {
+  color: #25201c;
+}
+
+@keyframes feature-scan {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes feature-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes feature-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feature-scan-line {
+  background-size: 220% 100%;
+  animation: feature-scan 7s ease-in-out infinite alternate;
+}
+
+.feature-image-float {
+  animation: feature-float 7s ease-in-out infinite;
+}
+
+.feature-card-rise,
+.feature-chip-animate {
+  animation: feature-rise 700ms ease both;
+}
+
+.services-copy-animate,
+.services-visual-animate,
+.service-row-animate {
+  animation: feature-rise 720ms ease both;
+}
+
+.services-visual-animate {
+  animation-name: feature-rise, feature-float;
+  animation-duration: 720ms, 8s;
+  animation-delay: 120ms, 900ms;
+  animation-timing-function: ease, ease-in-out;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: both, none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-scan-line,
+  .feature-image-float,
+  .feature-card-rise,
+  .feature-chip-animate,
+  .services-copy-animate,
+  .services-visual-animate,
+  .service-row-animate {
+    animation: none;
+  }
+}

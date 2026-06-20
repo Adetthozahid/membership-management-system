@@ -1,0 +1,11 @@
+node_modules
+.npm-cache
+npm-debug.log
+.next
+dist
+coverage
+.git
+.env
+.env.local
+*.log
+*.pid

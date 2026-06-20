@@ -1,0 +1,473 @@
+Senior QA & Software Architecture Inspection Report
+Project: Membership Management System
+Scope: Code structure only
+
+No code, UI, business logic, or database schema changes were made.
+
+1. Root Folder Summary
+----------------------
+Root path:
+C:\Users\UseR\Documents\Membership Management System
+
+Current root structure:
+
+Membership Management System/
+  apps/                 frontend and backend workspaces
+  packages/             shared workspace package
+  uploads/              runtime uploaded files
+  node_modules/         installed dependencies
+  .npm-cache/           local npm cache
+  docker-compose.yml    postgres/api/web compose setup
+  package.json          root npm workspace scripts
+  package-lock.json
+  tsconfig.base.json
+  README.md
+  many *.log / *.pid    local runtime artifacts
+
+Assessment:
+Root structure is valid for an npm workspace monorepo.
+However, runtime files are mixed into the project root, including logs, pid files, token files, and local upload metadata.
+
+2. apps/web Frontend Structure Summary
+--------------------------------------
+Frontend path:
+apps/web/
+
+Current structure:
+
+apps/web/
+  app/                  Next.js App Router routes
+  components/           admin/auth/member/public/ui components
+  lib/                  API clients, auth client, helpers, PDF helpers
+  public/               static assets
+  middleware.ts
+  next.config.mjs
+  tailwind.config.ts
+  package.json
+  tsconfig.json
+
+Main app route folders:
+
+apps/web/app/
+  about/
+  admin/
+  committees/
+  corrections/
+  dashboard/
+  deashboad/
+  donation/
+  election-results/
+  events/
+  forbidden/
+  gallery/
+  login/
+  member/
+  members/
+  notices/
+  register/
+  reset-password/
+  smritir-pata/
+  srithir-patha/
+  unauthorized/
+  verify/
+
+Admin route folders:
+
+apps/web/app/admin/
+  applications/
+  events/
+  form-builder/
+  gallery/
+  login/
+  members/
+  membership-types/
+  notices/
+  renewal-settings/
+  smritir-pata/
+  srithir-patha/
+  website/
+
+Member route folders:
+
+apps/web/app/member/
+  certificates/
+  chanda/
+  change-password/
+  chat/
+  committee-history/
+  donations/
+  events/
+  id-card/
+  login/
+  notices/
+  notifications/
+  payments/
+  profile/
+  registration/
+  renewal/
+  smritir-pata/
+
+Assessment:
+Frontend has clear public, admin, and member route separation.
+Admin and member layouts exist.
+The main issue is that several route files and components are too large and contain too much feature logic directly.
+
+3. apps/api Backend Structure Summary
+-------------------------------------
+Backend path:
+apps/api/
+
+Current structure:
+
+apps/api/
+  src/
+    audit/
+    auth/
+    chat/
+    form-builder/
+    health/
+    mail/
+    members/
+    membership-types/
+    prisma/
+    public-content/
+    renewals/
+  prisma/
+    schema.prisma
+    seed.js
+    migrations/
+  Dockerfile
+  nest-cli.json
+  package.json
+  tsconfig.json
+  tsconfig.build.json
+
+Assessment:
+Backend follows NestJS module-based organization.
+Most feature folders have module, controller, service, and dto structure.
+The main structural issue is that large services directly contain Prisma queries, workflow logic, serialization, and upload handling.
+
+4. packages/shared Structure Summary
+------------------------------------
+Shared package path:
+packages/shared/
+
+Current structure:
+
+packages/shared/
+  src/
+    constants.ts
+    index.ts
+    types.ts
+  package.json
+  tsconfig.json
+  eslint.config.mjs
+
+Assessment:
+The shared package exists and is useful.
+However, packages/shared/src/types.ts is too centralized and mixes many domains:
+
+auth
+member
+public content
+gallery
+renewal
+notification
+form builder
+ID card settings
+
+Recommended future improvement:
+Split shared types into domain-specific files while keeping backwards-compatible exports.
+
+5. Very Large Files
+-------------------
+Largest structure-risk files found:
+
+apps/web/app/admin/website/page.tsx                         151112 bytes
+apps/web/components/admin/blog-post-editor.tsx               88151 bytes
+apps/api/src/public-content/public-content.service.ts        82670 bytes
+apps/web/components/admin/gallery-manager.tsx                65149 bytes
+apps/api/src/members/members.service.ts                      55098 bytes
+apps/web/app/register/registration-form.tsx                  36506 bytes
+apps/web/components/app-shell.tsx                            35723 bytes
+apps/web/components/admin/content-module-manager.tsx         34412 bytes
+apps/web/components/admin/media-library.tsx                  29900 bytes
+apps/web/app/member/registration/page.tsx                    28971 bytes
+apps/web/app/member/id-card/page.tsx                         28541 bytes
+apps/web/app/admin/form-builder/page.tsx                     23514 bytes
+apps/web/app/admin/page.tsx                                  21117 bytes
+apps/web/app/page.tsx                                        19356 bytes
+apps/web/app/member/chat/page.tsx                            18958 bytes
+apps/api/src/public-content/public-content.controller.ts     17985 bytes
+apps/api/src/form-builder/form-builder.service.ts            17785 bytes
+apps/api/src/renewals/renewals.service.ts                    16587 bytes
+packages/shared/src/types.ts                                 12497 bytes
+
+Assessment:
+These files are not necessarily broken, but they are risky for long-term maintenance.
+They are harder to test, review, debug, and refactor safely.
+
+6. Duplicate Or Typo Routes
+---------------------------
+Likely typo or legacy duplicate routes:
+
+apps/web/app/dashboard/
+apps/web/app/deashboad/
+
+Issue:
+deashboad appears to be a typo of dashboard.
+
+Likely legacy or alternate spelling routes:
+
+apps/web/app/smritir-pata/
+apps/web/app/srithir-patha/
+
+apps/web/app/admin/smritir-pata/
+apps/web/app/admin/srithir-patha/
+
+Issue:
+smritir-pata and srithir-patha both exist.
+Some srithir-patha routes appear to redirect to smritir-pata.
+
+Naming inconsistency:
+
+route: smritir-pata
+legacy route: srithir-patha
+internal key: srithir_patha
+visible label: Smritir Pata
+
+Risk:
+Removing or renaming these routes without redirects may break live links, bookmarks, CMS links, and user navigation.
+
+7. Files Where Frontend API Calls Are Directly Written
+------------------------------------------------------
+Files containing direct fetch, apiRequest, upload helper, or public API helper usage:
+
+apps/web/lib/api.ts
+apps/web/lib/auth-client.ts
+apps/web/lib/id-card-pdf.ts
+apps/web/components/app-shell.tsx
+apps/web/components/admin/blog-post-editor.tsx
+apps/web/components/admin/gallery-manager.tsx
+apps/web/components/admin/media-edit-page.tsx
+apps/web/components/admin/media-library.tsx
+apps/web/app/layout.tsx
+apps/web/app/register/page.tsx
+apps/web/app/register/registration-form.tsx
+apps/web/app/corrections/[token]/page.tsx
+apps/web/app/gallery/page.tsx
+apps/web/app/donation/page.tsx
+apps/web/app/election-results/page.tsx
+apps/web/app/events/page.tsx
+apps/web/app/events/[slug]/page.tsx
+apps/web/app/notices/page.tsx
+apps/web/app/notices/[slug]/page.tsx
+apps/web/app/committees/current/page.tsx
+apps/web/app/committees/previous/page.tsx
+apps/web/app/smritir-pata/page.tsx
+apps/web/app/smritir-pata/[slug]/page.tsx
+apps/web/app/admin/website/page.tsx
+apps/web/app/admin/applications/[id]/page.tsx
+apps/web/app/admin/renewal-settings/page.tsx
+apps/web/app/member/page.tsx
+apps/web/app/member/chat/page.tsx
+apps/web/app/member/id-card/page.tsx
+apps/web/app/member/profile/page.tsx
+apps/web/app/member/registration/page.tsx
+
+Assessment:
+There is a central lib layer, but many pages/components still contain direct API access.
+Future improvement should move these calls into service files or feature-specific API modules.
+
+8. Backend Modules And Completeness
+-----------------------------------
+Module completeness summary:
+
+audit
+  module: yes
+  controller: no
+  service: yes
+  dto: no
+  note: acceptable as internal infrastructure module
+
+auth
+  module: yes
+  controller: yes
+  service: yes
+  dto: yes
+  dto files: change-password.dto.ts, login.dto.ts
+
+chat
+  module: yes
+  controller: yes
+  service: yes
+  dto: yes
+  dto files: chat.dto.ts
+
+form-builder
+  module: yes
+  controller: yes
+  service: yes
+  dto: yes
+  dto files: form-field.dto.ts, form-section.dto.ts, public-registration.dto.ts
+
+health
+  module: yes
+  controller: yes
+  service: yes
+  dto: no
+  note: acceptable for simple health endpoint
+
+mail
+  module: yes
+  controller: no
+  service: yes
+  dto: no
+  note: acceptable as internal infrastructure module
+
+members
+  module: yes
+  controller: yes
+  service: yes
+  dto: yes
+  dto files: application-workflow.dto.ts, create-member-payment.dto.ts, member-query.dto.ts, update-member-status.dto.ts
+
+membership-types
+  module: yes
+  controller: yes
+  service: yes
+  dto: yes
+  dto files: membership-type.dto.ts
+
+prisma
+  module: yes
+  controller: no
+  service: yes
+  dto: no
+  note: acceptable as database infrastructure module
+
+public-content
+  module: yes
+  controller: yes
+  service: yes
+  dto: no
+  note: this module should likely have DTO files because it exposes many admin, public, and member endpoints
+
+renewals
+  module: yes
+  controller: yes
+  service: yes
+  dto: yes
+  dto files: record-renewal.dto.ts
+
+9. Risk Level
+-------------
+Overall risk level: Medium
+
+High-risk structure areas:
+
+1. Very large all-in-one files.
+2. Scattered upload handling.
+3. Duplicate or typo routes.
+4. Missing test/spec folders.
+5. Direct Prisma access inside large services.
+6. Direct frontend API calls inside many pages/components.
+
+Medium-risk structure areas:
+
+1. Shared types centralized in one large file.
+2. Missing repository layer.
+3. Public-content module has no DTO folder.
+4. Root contains many runtime artifacts.
+
+Low-risk areas:
+
+1. Monorepo separation.
+2. NestJS module presence.
+3. Prisma migration/seed placement.
+4. Basic admin/member/public route separation.
+5. Shared package existence.
+
+10. Exact Recommended Refactor Order
+------------------------------------
+Recommended safe order:
+
+1. Update .gitignore only for runtime artifacts.
+   Add patterns such as:
+   *.pid
+   *.token
+   *.upload.json
+   *.tsbuildinfo
+   uploads/
+   apps/api/uploads/
+
+2. Add test folder and script structure without changing app behavior.
+   Suggested folders:
+   apps/api/test/
+   apps/web/__tests__/
+
+3. Document legacy or typo routes.
+   Specifically document:
+   deashboad
+   srithir-patha
+
+4. Split packages/shared/src/types.ts into domain type files.
+   Keep backwards-compatible exports so existing imports do not break.
+
+5. Create frontend service folders.
+   Move API calls behind service functions gradually.
+   Do not change API behavior.
+
+6. Make frontend route files thinner.
+   Keep existing routes.
+   Move feature logic into feature folders.
+
+7. Extract apps/web/app/admin/website/page.tsx into:
+   apps/web/features/admin/website/
+
+8. Create backend common folders:
+   apps/api/src/common/guards/
+   apps/api/src/common/decorators/
+   apps/api/src/common/upload/
+
+9. Move guards/decorators carefully.
+   Keep old imports as re-export wrappers until all imports are updated.
+
+10. Centralize upload constants and helper service.
+    Do not change /uploads/... URL paths.
+
+11. Add repository layer feature-by-feature.
+    Recommended order:
+    membership-types
+    renewals
+    auth
+    members
+    public-content
+
+12. Split public-content.service.ts.
+    Suggested services:
+    media.service.ts
+    gallery.service.ts
+    website-settings.service.ts
+    blog.service.ts
+
+13. Split members.service.ts.
+    Suggested services:
+    member-application.service.ts
+    member-profile.service.ts
+    member-payment.service.ts
+    member-self.service.ts
+
+14. Add DTO folder/files for public-content.
+
+15. Only after tests and redirects are confirmed, clean up typo/legacy route folders.
+
+Final Note
+----------
+The current structure is workable and not broken.
+The main architectural concern is not separation between frontend/backend; that part is good.
+The main concern is growth pressure: large files, scattered API/upload logic, missing repository layer, centralized shared types, and missing tests.
+
+Recommended approach:
+Avoid a big-bang refactor.
+Make small, reversible, compatibility-preserving structure improvements first.

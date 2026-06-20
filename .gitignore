@@ -1,0 +1,16 @@
+node_modules
+.npm-cache
+.next
+dist
+coverage
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+!.env.example
+*.log
+Dockerfile.local
+*.pid
+.member.token
+.member.upload.json
+apps/api/uploads/
