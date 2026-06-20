@@ -15,16 +15,18 @@ const adminHost = hostnameFromUrl(adminUrl);
 const hasDedicatedAdminHost = Boolean(adminHost && adminHost !== siteHost);
 
 export function middleware(request: NextRequest) {
-  const requestHost = request.nextUrl.hostname.toLowerCase();
-  const isAdminHost = hasDedicatedAdminHost && requestHost === adminHost;
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim().toLowerCase();
+  const requestHost = (forwardedHost || request.nextUrl.hostname).toLowerCase();
+  const isConfiguredAdminHost = hasDedicatedAdminHost && requestHost === adminHost;
+  const isAdminHost = isConfiguredAdminHost || requestHost.startsWith("admin.");
   const isAdminPath = request.nextUrl.pathname === "/admin" || request.nextUrl.pathname.startsWith("/admin/");
   const isLoginPath = request.nextUrl.pathname === "/login";
 
   if (isAdminHost && (request.nextUrl.pathname === "/" || isLoginPath)) {
-    return NextResponse.rewrite(new URL("/admin/login", request.url));
+    return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
-  if (adminUrl && hasDedicatedAdminHost && !isAdminHost && isAdminPath) {
+  if (adminUrl && hasDedicatedAdminHost && !isConfiguredAdminHost && isAdminPath) {
     const redirectUrl = new URL(request.nextUrl.pathname + request.nextUrl.search, adminUrl);
     return NextResponse.redirect(redirectUrl);
   }
