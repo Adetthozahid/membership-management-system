@@ -22,8 +22,12 @@ export function middleware(request: NextRequest) {
   const isAdminPath = request.nextUrl.pathname === "/admin" || request.nextUrl.pathname.startsWith("/admin/");
   const isLoginPath = request.nextUrl.pathname === "/login";
 
-  if (isAdminHost && (request.nextUrl.pathname === "/" || isLoginPath)) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+  if (isAdminHost && request.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (isAdminHost && isLoginPath) {
+    return NextResponse.rewrite(new URL("/admin/login", request.url));
   }
 
   if (adminUrl && hasDedicatedAdminHost && !isConfiguredAdminHost && isAdminPath) {

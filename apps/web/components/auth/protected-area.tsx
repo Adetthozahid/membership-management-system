@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { refreshSession, verifyPermission } from "@/lib/auth-client";
 
-function isAdminRootLoginAlias(pathname: string, loginPath: string) {
-  if (pathname !== "/" || loginPath !== "/admin/login") return false;
+function isAdminLoginAlias(pathname: string, loginPath: string) {
+  if (!["/", "/login"].includes(pathname) || loginPath !== "/admin/login") return false;
   if (typeof window === "undefined") return false;
   return window.location.hostname.toLowerCase().startsWith("admin.");
 }
@@ -21,13 +21,13 @@ export function ProtectedArea({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [status, setStatus] = useState<"checking" | "allowed">(() => (pathname === loginPath || isAdminRootLoginAlias(pathname, loginPath) ? "allowed" : "checking"));
+  const [status, setStatus] = useState<"checking" | "allowed">(() => (pathname === loginPath || isAdminLoginAlias(pathname, loginPath) ? "allowed" : "checking"));
 
   useEffect(() => {
     let cancelled = false;
 
     async function check() {
-      if (pathname === loginPath || isAdminRootLoginAlias(pathname, loginPath)) {
+      if (pathname === loginPath || isAdminLoginAlias(pathname, loginPath)) {
         setStatus("allowed");
         return;
       }
