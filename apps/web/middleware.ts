@@ -26,10 +26,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (isAdminHost && isLoginPath) {
-    return NextResponse.rewrite(new URL("/admin/login", request.url));
-  }
-
   if (adminUrl && hasDedicatedAdminHost && !isConfiguredAdminHost && isAdminPath) {
     const redirectUrl = new URL(request.nextUrl.pathname + request.nextUrl.search, adminUrl);
     return NextResponse.redirect(redirectUrl);
