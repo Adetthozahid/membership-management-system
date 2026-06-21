@@ -16,10 +16,19 @@ import { Button } from "@/components/ui/button";
 import { getPublicCollection, getPublicSite } from "@/lib/api";
 import type { PublicGalleryAlbum } from "@mms/shared";
 
-export const metadata: Metadata = {
-  title: "Home",
-  description: "Official website for the Sociology Alumni Association of SUST.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getPublicSite().catch(() => null);
+  const title = site?.website.siteTitle || site?.organization.name || APP_NAME;
+
+  return {
+    title: {
+      absolute: title,
+    },
+    description:
+      site?.website.metaDescription ??
+      "Official website for the Sociology Alumni Association of SUST.",
+  };
+}
 
 export const dynamic = "force-dynamic";
 
