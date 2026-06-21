@@ -22,12 +22,21 @@ export function HomeUpdatesTabs({ events, notices }: { events: HomeContentItem[]
 
   function formatDate(value: string | null | undefined) {
     if (!value) return null;
-    return new Intl.DateTimeFormat("en", { month: "short", day: "2-digit", year: "numeric" }).format(new Date(value));
+    return new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "short",
+      timeZone: "Asia/Dhaka",
+      year: "numeric",
+    }).format(new Date(value));
   }
 
   function formatTime(value: string | null | undefined) {
     if (!value) return null;
-    return new Intl.DateTimeFormat("en", { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+    return new Intl.DateTimeFormat("en", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Asia/Dhaka",
+    }).format(new Date(value));
   }
 
   return (
