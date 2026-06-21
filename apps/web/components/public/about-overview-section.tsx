@@ -142,7 +142,7 @@ export function AboutOverviewSection({
       content?.overview?.bodySecondary ??
       "We aim to strengthen bonds among alumni, support the academic and professional journey of current students, and contribute to the advancement of the department and society at large.",
     imageUrl:
-      content?.overview?.imageUrl ?? "/images/sust-slider-campus-building.jpg",
+      content?.overview?.imageUrl ?? "/images/sust-slider-campus-building.webp",
     imageAlt: content?.overview?.imageAlt ?? "SUST campus",
     primaryLabel: content?.overview?.primaryLabel ?? "Become a member",
     primaryHref: content?.overview?.primaryHref ?? "/register",

@@ -38,7 +38,7 @@ export function PublicPageHeader({
         <div className="absolute right-16 top-5 h-32 w-32 rounded-full bg-[hsl(var(--terracotta))]/80" />
         <div className="absolute inset-x-0 bottom-0 top-2">
           <Image
-            src="/images/sust-slider-academic-building.jpg"
+            src="/images/sust-slider-academic-building.webp"
             alt=""
             fill
             sizes="520px"

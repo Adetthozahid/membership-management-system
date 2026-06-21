@@ -97,7 +97,7 @@ export function ServicesSection({ stats, content }: ServicesSectionProps) {
     "Friendship, cooperation, and academic excellence for Sociology graduates.";
   const HighlightIcon = iconFor(content?.highlightIcon, Handshake);
   const imageUrl =
-    content?.imageUrl ?? "/images/sust-slider-campus-building.jpg";
+    content?.imageUrl ?? "/images/sust-slider-campus-building.webp";
   const ctaTitle = content?.ctaTitle ?? "Be a part of our journey";
   const ctaLabel = content?.ctaLabel ?? "Join the Association";
   const ctaHref = content?.ctaHref ?? "/register";

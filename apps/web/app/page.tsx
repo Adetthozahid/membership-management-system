@@ -63,49 +63,49 @@ const fallbackGalleryPhotos = [
   {
     id: "fallback-gallery-main-gate",
     title: "SUST alumni gathering",
-    thumbnailUrl: "/images/home-hero.png",
+    thumbnailUrl: "/images/home-hero.webp",
     caption: null,
     albumTitle: "Gallery",
   },
   {
     id: "fallback-gallery-campus",
     title: "Campus program",
-    thumbnailUrl: "/images/home-hero-campus.png",
+    thumbnailUrl: "/images/home-hero-campus.webp",
     caption: null,
     albumTitle: "Gallery",
   },
   {
     id: "fallback-gallery-networking",
     title: "Networking session",
-    thumbnailUrl: "/images/home-hero-networking.png",
+    thumbnailUrl: "/images/home-hero-networking.webp",
     caption: null,
     albumTitle: "Gallery",
   },
   {
     id: "fallback-gallery-building",
     title: "Academic program",
-    thumbnailUrl: "/images/sust-slider-academic-building.jpg",
+    thumbnailUrl: "/images/sust-slider-academic-building.webp",
     caption: null,
     albumTitle: "Gallery",
   },
   {
     id: "fallback-gallery-pond",
     title: "Campus memories",
-    thumbnailUrl: "/images/sust-about-pond.png",
+    thumbnailUrl: "/images/sust-about-pond.webp",
     caption: null,
     albumTitle: "Gallery",
   },
   {
     id: "fallback-gallery-memorial",
     title: "SUST memorial",
-    thumbnailUrl: "/images/sust-slider-memorial.jpg",
+    thumbnailUrl: "/images/sust-slider-memorial.webp",
     caption: null,
     albumTitle: "Gallery",
   },
   {
     id: "fallback-gallery-slider",
     title: "Campus life",
-    thumbnailUrl: "/images/sust-slider-campus-building.jpg",
+    thumbnailUrl: "/images/sust-slider-campus-building.webp",
     caption: null,
     albumTitle: "Gallery",
   },
@@ -149,7 +149,7 @@ const fallbackAlumniVoices: AlumniVoice[] = [
     role: "Sociology Graduate",
     affiliation: "SUST",
     initials: "AM",
-    imageUrl: "/images/demo-alumni-professor.png",
+    imageUrl: "/images/demo-alumni-professor.webp",
     quote:
       "This association helps former students stay connected with the department, classmates, and the wider alumni community.",
   },
@@ -158,7 +158,7 @@ const fallbackAlumniVoices: AlumniVoice[] = [
     role: "Association Contributor",
     affiliation: "Sociology Alumni Association of SUST",
     initials: "CV",
-    imageUrl: "/images/demo-alumni-professor.png",
+    imageUrl: "/images/demo-alumni-professor.webp",
     quote:
       "A strong alumni network can support mentorship, events, career guidance, and meaningful collaboration across batches.",
   },
@@ -167,7 +167,7 @@ const fallbackAlumniVoices: AlumniVoice[] = [
     role: "Department of Sociology",
     affiliation: "Shahjalal University of Science and Technology",
     initials: "FS",
-    imageUrl: "/images/demo-alumni-professor.png",
+    imageUrl: "/images/demo-alumni-professor.webp",
     quote:
       "The platform creates a shared place for memories, notices, verified member records, and future initiatives.",
   },
@@ -221,7 +221,7 @@ export default async function HomePage() {
       eyebrow: "SUST Sociology alumni network",
       title: "SUST Sociology Alumni|Stay Connected",
       body: organization.message || defaultMessage,
-      image: "/images/sust-slider-main-gate.jpg",
+      image: "/images/sust-slider-main-gate.webp",
       position: "center center",
       accent: "bg-[hsl(var(--cream))]",
     },
@@ -229,7 +229,7 @@ export default async function HomePage() {
       eyebrow: "SUST campus memory",
       title: "Rooted in memory, united for the future.",
       body: "A shared platform for former students to stay connected with classmates, the department, and the university community.",
-      image: "/images/sust-slider-memorial.jpg",
+      image: "/images/sust-slider-memorial.webp",
       position: "center center",
       accent: "bg-[hsl(var(--terracotta))]",
     },
@@ -237,7 +237,7 @@ export default async function HomePage() {
       eyebrow: "Membership and verification",
       title: "One trusted record for every alumnus.",
       body: "Apply for membership, verify alumni identity, and keep a safe public profile connected to the association.",
-      image: "/images/sust-slider-academic-building.jpg",
+      image: "/images/sust-slider-academic-building.webp",
       position: "center center",
       accent: "bg-primary",
     },
@@ -245,7 +245,7 @@ export default async function HomePage() {
       eyebrow: "Programs, notices, and collaboration",
       title: "Stay close to campus and community.",
       body: "Follow association notices, upcoming events, reunions, academic programs, and alumni initiatives from one place.",
-      image: "/images/sust-slider-campus-building.jpg",
+      image: "/images/sust-slider-campus-building.webp",
       position: "center center",
       accent: "bg-[hsl(var(--terracotta))]",
     },
@@ -413,7 +413,7 @@ export default async function HomePage() {
             />
             <div className="relative ml-4 mt-8 overflow-hidden rounded-md rounded-tl-[56px] rounded-br-[56px] border-8 border-[hsl(var(--cream))] bg-primary shadow-2xl shadow-primary/20 sm:ml-8 lg:mt-0">
               <div
-                className="aspect-[1.08/1] bg-[url('/images/sust-about-pond.png')] bg-cover bg-center"
+                className="aspect-[1.08/1] bg-[url('/images/sust-about-pond.webp')] bg-cover bg-center"
                 style={{ backgroundPosition: "center 58%" }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/34 via-transparent to-transparent" />

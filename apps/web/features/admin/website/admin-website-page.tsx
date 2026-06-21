@@ -124,7 +124,7 @@ const defaultAboutBlocks: AboutBlock[] = [
     body: "The Sociology Alumni Association of SUST is a voluntary, non-political and non-profit organization of proud graduates of the Department of Sociology, Shahjalal University of Science and Technology.",
     bodySecondary:
       "We aim to strengthen bonds among alumni, support the academic and professional journey of current students, and contribute to the advancement of the department and society at large.",
-    imageUrl: "/images/sust-slider-campus-building.jpg",
+    imageUrl: "/images/sust-slider-campus-building.webp",
     imageAlt: "SUST campus",
     primaryLabel: "Become a member",
     primaryHref: "/register",
@@ -179,7 +179,7 @@ const defaultAboutBlocks: AboutBlock[] = [
     highlight:
       "Friendship, cooperation, and academic excellence for Sociology graduates.",
     highlightIcon: "handshake",
-    imageUrl: "/images/sust-slider-campus-building.jpg",
+    imageUrl: "/images/sust-slider-campus-building.webp",
     ctaTitle: "Be a part of our journey",
     ctaLabel: "Join the Association",
     ctaHref: "/register",

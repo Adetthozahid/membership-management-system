@@ -75,7 +75,7 @@ export function LoginForm({ scope }: { scope: "admin" | "member" }) {
               <div className="relative">
                 <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[hsl(var(--terracotta)/0.78)]" />
                 <Image
-                  src="/images/sust-monument-login-retouched.png"
+                  src="/images/sust-monument-login-retouched.webp"
                   alt="SUST campus monument"
                   width={420}
                   height={520}
