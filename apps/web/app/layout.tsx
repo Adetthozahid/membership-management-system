@@ -52,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: website?.metaDescription ?? "Single-organization membership management system",
     keywords: website?.metaKeywords?.split(",").map((keyword) => keyword.trim()).filter(Boolean),
-    icons: website?.faviconUrl ? { icon: website.faviconUrl } : undefined
+    icons: { icon: website?.faviconUrl || "/favicon.svg" }
   };
 }
 
