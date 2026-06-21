@@ -85,7 +85,11 @@ const adminNav = [
 ];
 
 type WebsiteNavItem = (typeof fallbackWebsiteNav)[number];
-type WebsiteIdentity = { siteTitle: string; logoUrl: string | null };
+type WebsiteIdentity = {
+  siteTitle: string;
+  websiteSubtitle: string;
+  logoUrl: string | null;
+};
 type NotificationToast = { id: string; title: string; message: string; href: string } | null;
 type MemberNotificationSummary = {
   id: string;
@@ -95,7 +99,7 @@ type MemberNotificationSummary = {
   href: string;
   createdAt: string;
 };
-const websiteSubtitle = "সাস্ট সমাজবিজ্ঞান অ্যালামনাই অ্যাসোসিয়েশন";
+const fallbackWebsiteSubtitle = "সাস্ট সমাজবিজ্ঞান অ্যালামনাই অ্যাসোসিয়েশন";
 
 function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -127,6 +131,7 @@ export function AppShell({
   const [websiteIdentity, setWebsiteIdentity] = useState<WebsiteIdentity>(
     initialWebsiteIdentity ?? {
       siteTitle: APP_NAME,
+      websiteSubtitle: fallbackWebsiteSubtitle,
       logoUrl: null,
     },
   );
@@ -152,7 +157,11 @@ export function AppShell({
       .then(
         (
           data: {
-            website?: { siteTitle?: string; logoUrl?: string | null };
+            website?: {
+              siteTitle?: string;
+              websiteSubtitle?: string | null;
+              logoUrl?: string | null;
+            };
             organization?: { name?: string };
           } | null,
         ) => {
@@ -160,6 +169,8 @@ export function AppShell({
             setWebsiteIdentity({
               siteTitle:
                 data.website?.siteTitle || data.organization?.name || APP_NAME,
+              websiteSubtitle:
+                data.website?.websiteSubtitle || fallbackWebsiteSubtitle,
               logoUrl: data.website?.logoUrl ?? null,
             });
           }
@@ -503,7 +514,7 @@ export function AppShell({
                 {websiteIdentity.siteTitle}
               </span>
               <span className="block truncate text-[11px] font-semibold leading-4 text-foreground/70 sm:text-xs sm:leading-5">
-                {websiteSubtitle}
+                {websiteIdentity.websiteSubtitle}
               </span>
             </span>
           </Link>
@@ -672,7 +683,7 @@ export function AppShell({
                   {websiteIdentity.siteTitle}
                 </span>
                 <span className="text-xs font-medium text-white/55">
-                  {websiteSubtitle}
+                  {websiteIdentity.websiteSubtitle}
                 </span>
               </span>
             </Link>

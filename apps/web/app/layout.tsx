@@ -58,7 +58,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [site, navigation] = await Promise.all([getPublicSite(), getPublicNavigation()]);
-  const website = site?.website as { siteTitle?: string; logoUrl?: string | null } | undefined;
+  const website = site?.website as
+    | {
+        siteTitle?: string;
+        websiteSubtitle?: string | null;
+        logoUrl?: string | null;
+      }
+    | undefined;
   const organization = site?.organization as { name?: string } | undefined;
 
   return (
@@ -71,6 +77,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           )}
           initialWebsiteIdentity={{
             siteTitle: website?.siteTitle || organization?.name || APP_NAME,
+            websiteSubtitle:
+              website?.websiteSubtitle || "সাস্ট সমাজবিজ্ঞান অ্যালামনাই অ্যাসোসিয়েশন",
             logoUrl: website?.logoUrl ?? null
           }}
         >

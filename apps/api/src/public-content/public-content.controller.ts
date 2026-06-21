@@ -230,6 +230,7 @@ export class AdminWebsiteController {
     @Body()
     body: {
       siteTitle?: string;
+      websiteSubtitle?: string | null;
       logoUrl?: string | null;
       faviconUrl?: string | null;
       metaKeywords?: string | null;

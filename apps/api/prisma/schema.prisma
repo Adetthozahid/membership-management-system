@@ -101,6 +101,7 @@ model WebsiteSectionSetting {
 model WebsiteGeneralSetting {
   id              String   @id @default(uuid())
   siteTitle       String
+  websiteSubtitle String   @default("সাস্ট সমাজবিজ্ঞান অ্যালামনাই অ্যাসোসিয়েশন")
   logoUrl         String?
   faviconUrl      String?
   metaKeywords    String?

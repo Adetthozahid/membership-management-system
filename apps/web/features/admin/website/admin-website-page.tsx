@@ -250,6 +250,7 @@ function emptyGeneral(): WebsiteGeneral {
   return {
     id: "",
     siteTitle: "",
+    websiteSubtitle: "",
     logoUrl: "",
     faviconUrl: "",
     metaKeywords: "",
@@ -1249,6 +1250,19 @@ export function AdminWebsitePage() {
                   value={general.siteTitle}
                   onChange={(event) =>
                     setGeneral({ ...general, siteTitle: event.target.value })
+                  }
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="font-medium">Bangla subtitle</span>
+                <input
+                  className="mt-2 h-10 w-full rounded-md border bg-background px-3 text-sm"
+                  value={general.websiteSubtitle}
+                  onChange={(event) =>
+                    setGeneral({
+                      ...general,
+                      websiteSubtitle: event.target.value,
+                    })
                   }
                 />
               </label>

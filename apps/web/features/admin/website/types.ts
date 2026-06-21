@@ -10,6 +10,7 @@ export type Tab =
 export type WebsiteGeneral = {
   id: string;
   siteTitle: string;
+  websiteSubtitle: string;
   logoUrl: string | null;
   faviconUrl: string | null;
   metaKeywords: string | null;

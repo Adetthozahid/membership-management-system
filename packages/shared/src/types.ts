@@ -397,6 +397,7 @@ export interface PublicSiteOverview {
   };
   website: {
     siteTitle: string;
+    websiteSubtitle: string;
     logoUrl: string | null;
     faviconUrl: string | null;
     metaKeywords: string | null;

@@ -123,6 +123,7 @@ export class PublicContentService {
 
   async updateGeneralSettings(input: {
     siteTitle?: string;
+    websiteSubtitle?: string | null;
     logoUrl?: string | null;
     faviconUrl?: string | null;
     metaKeywords?: string | null;
@@ -135,6 +136,10 @@ export class PublicContentService {
       where: { id: current.id },
       data: {
         siteTitle: input.siteTitle?.trim() || current.siteTitle,
+        websiteSubtitle:
+          input.websiteSubtitle === undefined
+            ? undefined
+            : input.websiteSubtitle?.trim() || current.websiteSubtitle,
         logoUrl: this.optionalString(input.logoUrl),
         faviconUrl: this.optionalString(input.faviconUrl),
         metaKeywords: this.optionalString(input.metaKeywords),
@@ -295,6 +300,7 @@ export class PublicContentService {
       },
       website: {
         siteTitle: website.siteTitle,
+        websiteSubtitle: website.websiteSubtitle,
         logoUrl: website.logoUrl,
         faviconUrl: website.faviconUrl,
         metaKeywords: website.metaKeywords,
@@ -1752,6 +1758,7 @@ export class PublicContentService {
     return this.prisma.websiteGeneralSetting.create({
       data: {
         siteTitle: "Membership Organization",
+        websiteSubtitle: "সাস্ট সমাজবিজ্ঞান অ্যালামনাই অ্যাসোসিয়েশন",
         metaKeywords: "membership, organization, members, events, notices",
         metaDescription:
           "Official public website for membership registration, directory, notices, events, donation, and member verification.",
